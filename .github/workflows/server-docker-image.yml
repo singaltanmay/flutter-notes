@@ -17,7 +17,8 @@ jobs:
       packages: write
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout the repository
+      uses: actions/checkout@v2
     
     - uses: dorny/paths-filter@v2
       id: changes
@@ -25,8 +26,8 @@ jobs:
         filters: |
           src:
             - 'server/**'
-            # run only if some file in 'server' folder was changed
-    - name: Check for any changes
+      
+    - name: Check for any changes in server/ folder
       run: if [[ {{steps.changes.outputs.src}} == 'false' ]]; then \
             echo 'There are no changes in the server/ folder. Exiting' \
             exit 0 ; fi
@@ -49,12 +50,5 @@ jobs:
       with:
         context: ./server
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: echo ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
         labels: ${{ steps.meta.outputs.labels }}
-        
-    - name: List all tags
-      run: echo ${{ env.REGISTRY }} \
-           echo ${{ github.actor }} \
-           echo ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
-           echo ${{ steps.meta.outputs.tags }} \
-           echo ${{ steps.meta.outputs.labels }} \
