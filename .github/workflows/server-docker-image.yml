@@ -27,7 +27,7 @@ jobs:
             - 'server/**'
             
       # run only if some file in 'src' folder was changed
-      if: steps.changes.outputs.src == 'false'; then
+      if: steps.changes.outputs.src == 'false'
         echo "There are no changes in the server/ folder. Exiting"
         exit 0
           
