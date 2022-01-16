@@ -3,8 +3,12 @@ name: Server Docker Image CI
 on:
   push:
     branches: [ master ]
+    paths:
+    - /server/**
   pull_request:
     branches: [ master ]
+    paths:
+    - /server/**
     
 env:
   REGISTRY: ghcr.io
