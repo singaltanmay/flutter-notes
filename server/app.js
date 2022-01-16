@@ -8,14 +8,22 @@ const server = '127.0.0.1:27017';
 const database = 'flutter-notes-db';
 
 let mongooseConnected = false;
-mongoose.connect(`mongodb://${server}/${database}`, {
-    useNewUrlParser: true, useUnifiedTopology: true
-}).then(() => {
-    mongooseConnected = true;
-    console.log('Flutter Notes database connected!\n');
-}).catch(err => {
-    console.log('Failed to connect to Flutter Notes database\n', err);
-});
+let mongoUrl = `mongodb://${server}/${database}`;
+
+const connectWithRetry = function () {
+    return mongoose.connect(mongoUrl, {
+        useNewUrlParser: true, useUnifiedTopology: true
+    }, function (err) {
+        if (err) {
+            console.log('Failed to connect to Flutter Notes database on startup. Retrying in 5 sec', err);
+            setTimeout(connectWithRetry, 5000);
+        } else {
+            mongooseConnected = true;
+            console.log('Flutter Notes database connected!\n');
+        }
+    })
+};
+connectWithRetry();
 
 const app = express();
 
@@ -32,7 +40,7 @@ app.get('/', getAllNotes)
 app.post('/', saveNote)
 app.delete('/', deleteAllNotes)
 app.delete('/:noteId', deleteNote)
-app.get('/health', (_, res) => res.send(mongooseConnected) )
+app.get('/health', (_, res) => res.send(mongooseConnected))
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

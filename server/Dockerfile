@@ -29,9 +29,6 @@ WORKDIR /data
 # Expose MongoDb outside of container
 #EXPOSE 27017
 
-# Define default command.
-CMD ["mongod"]
-#
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt install -y nodejs
@@ -53,5 +50,5 @@ COPY . .
 
 EXPOSE 3000
 
-## Run the application
-CMD [ "node", "app.js" ]
+# Run the application
+ CMD mongod & npm start
