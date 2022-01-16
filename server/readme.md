@@ -13,5 +13,4 @@ $ docker pull ghcr.io/singaltanmay/flutter-notes:master
 ```angular2html
 $ docker run -p 3000:3000 -d --name flutter-notes ghcr.io/singaltanmay/flutter-notes:master
 ```
-
-
+You can change the port on which the application is exposed by modifying the `-p` flag as `-p <HOST_PORT>:3000`
