@@ -39,6 +39,6 @@ jobs:
       with:
         context: .
         push: true
-        working-directory: ./server
+        dockerfile: ./server/Dockerfile
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
