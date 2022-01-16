@@ -1,8 +1,8 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
 const mongoose = require('mongoose');
 
@@ -17,9 +17,7 @@ mongoose.connect(`mongodb://${server}/${database}`, {
     console.log('Failed to connect to Flutter Notes database', err);
 });
 
-var usersRouter = require('./routes/users');
-
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -37,8 +35,6 @@ app.post('/', saveNote)
 app.delete('/', deleteAllNotes)
 app.delete('/:noteId', deleteNote)
 
-app.use('/users', usersRouter);
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));
@@ -54,7 +50,6 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-
 
 const noteSchema = new mongoose.Schema({
     title: {type: String, required: true}, body: String, created: {type: Date, default: Date.now}
@@ -87,7 +82,7 @@ function deleteAllNotes(req, res, next) {
     Note.deleteMany().then(res.sendStatus(200)).catch(next)
 }
 
-function deleteNote(req, res, next){
+function deleteNote(req, res, next) {
     Note.deleteOne({'_id': req.params.noteId}).then(res.sendStatus(200)).catch(next)
 }
 
