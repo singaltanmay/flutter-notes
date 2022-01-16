@@ -34,6 +34,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // HTTP method declarations
 app.get('/', getAllNotes)
 app.post('/', saveNote)
+app.delete('/', deleteAllNotes)
+app.delete('/:noteId', deleteNote)
 
 app.use('/users', usersRouter);
 
@@ -60,7 +62,7 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model('Note', noteSchema);
 
-function getAllNotes(req, res) {
+function getAllNotes(req, res, next) {
     Note.find().then(notes => {
         res.send(notes)
     }).catch(err => {
@@ -69,7 +71,7 @@ function getAllNotes(req, res) {
     });
 }
 
-function saveNote(req, res) {
+function saveNote(req, res, next) {
     const note = new Note({
         title: req.body.title, body: req.body.body
     });
@@ -79,6 +81,14 @@ function saveNote(req, res) {
         }).catch(err => {
         next(err)
     });
+}
+
+function deleteAllNotes(req, res, next) {
+    Note.deleteMany().then(res.sendStatus(200)).catch(next)
+}
+
+function deleteNote(req, res, next){
+    Note.deleteOne({'_id': req.params.noteId}).then(res.sendStatus(200)).catch(next)
 }
 
 module.exports = app;
