@@ -1,20 +1,20 @@
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
 
 const mongoose = require('mongoose');
 
 const server = '127.0.0.1:27017';
 const database = 'flutter-notes-db';
 
+let mongooseConnected = false;
 mongoose.connect(`mongodb://${server}/${database}`, {
     useNewUrlParser: true, useUnifiedTopology: true
 }).then(() => {
-    console.log('Flutter Notes database connected!!');
+    mongooseConnected = true;
+    console.log('Flutter Notes database connected!\n');
 }).catch(err => {
-    console.log('Failed to connect to Flutter Notes database', err);
+    console.log('Failed to connect to Flutter Notes database\n', err);
 });
 
 const app = express();
@@ -23,10 +23,8 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // HTTP method declarations
@@ -34,6 +32,7 @@ app.get('/', getAllNotes)
 app.post('/', saveNote)
 app.delete('/', deleteAllNotes)
 app.delete('/:noteId', deleteNote)
+app.get('/health', (_, res) => res.send(mongooseConnected) )
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
