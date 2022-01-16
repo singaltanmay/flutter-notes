@@ -25,11 +25,10 @@ jobs:
         filters: |
           src:
             - 'server/**'
-            
-      # run only if some file in 'src' folder was changed
-      if: steps.changes.outputs.src == 'false'
-        echo "There are no changes in the server/ folder. Exiting"
-        exit 0
+            # run only if some file in 'server' folder was changed
+          - if: steps.changes.outputs.src == 'false'
+            run: echo 'There are no changes in the server/ folder. Exiting'
+            exit 0
           
     - name: Log in to the Container registry
       uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
