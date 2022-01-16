@@ -10,16 +10,13 @@ const server = '127.0.0.1:27017';
 const database = 'flutter-notes-db';
 
 mongoose.connect(`mongodb://${server}/${database}`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+    useNewUrlParser: true, useUnifiedTopology: true
 }).then(() => {
     console.log('Flutter Notes database connected!!');
 }).catch(err => {
     console.log('Failed to connect to Flutter Notes database', err);
 });
 
-
-var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
@@ -30,27 +27,58 @@ app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+// HTTP method declarations
+app.get('/', getAllNotes)
+app.post('/', saveNote)
+
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(function (req, res, next) {
+    next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(function (err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
+
+
+const noteSchema = new mongoose.Schema({
+    title: {type: String, required: true}, body: String, created: {type: Date, default: Date.now}
+})
+
+const Note = mongoose.model('Note', noteSchema);
+
+function getAllNotes(req, res) {
+    Note.find().then(notes => {
+        res.send(notes)
+    }).catch(err => {
+        console.log(err)
+        next(err)
+    });
+}
+
+function saveNote(req, res) {
+    const note = new Note({
+        title: req.body.title, body: req.body.body
+    });
+    note.save()
+        .then(note => {
+            res.sendStatus(200);
+        }).catch(err => {
+        next(err)
+    });
+}
 
 module.exports = app;
