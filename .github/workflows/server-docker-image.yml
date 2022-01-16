@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Server Docker Image CI
 
 on:
   push:
@@ -14,11 +14,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: List Code Root Directory
-      run: ls -lah
-    - name: Enter the server directory
-      run: cd server
-    - name: List server Directory
-      run: ls -lah
     - name: Build the Docker image
-      run: docker build --tag singaltanmay/flutter-notes-server:$(date +%s) .
+      working-directory: ./server
+      run: ls -lah && docker build --tag singaltanmay/flutter-notes-server:$(date +%s) .
