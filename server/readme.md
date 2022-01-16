@@ -1,0 +1,17 @@
+# Flutter Notes - Server
+
+This is the server for my notes application. It is built using ExpressJS and uses MongoDB for persistence.
+
+
+## Setup
+### 1. Pull the Docker image
+```angular2html
+$ docker pull ghcr.io/singaltanmay/flutter-notes:master
+```
+
+### 2. Start the container
+```angular2html
+$ docker run -p 3000:3000 -d --name flutter-notes ghcr.io/singaltanmay/flutter-notes:master
+```
+
+
