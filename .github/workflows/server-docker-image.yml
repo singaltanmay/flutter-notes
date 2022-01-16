@@ -28,7 +28,7 @@ jobs:
             - 'server/**'
       
     - name: Check for any changes in server/ folder
-      run: if [[ {{steps.changes.outputs.src}} == 'false' ]]; then \
+      run: if [[ {{steps.changes.outputs.src}} == false ]]; then \
             echo 'There are no changes in the server/ folder. Exiting' \
             exit 0 ; fi
           
@@ -50,5 +50,5 @@ jobs:
       with:
         context: ./server
         push: true
-        tags: echo ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        tags: "{{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
         labels: ${{ steps.meta.outputs.labels }}
