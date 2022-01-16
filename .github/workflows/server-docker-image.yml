@@ -4,11 +4,7 @@ on:
   push:
     branches: [ master ]
     paths:
-    - /server/**
-  pull_request:
-    branches: [ master ]
-    paths:
-    - /server/**
+    - ./server/**
     
 env:
   REGISTRY: ghcr.io
