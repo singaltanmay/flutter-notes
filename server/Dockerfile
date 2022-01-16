@@ -13,8 +13,8 @@
 FROM ubuntu:20.04
 
 # Install MongoDB.
-RUN apt update
-RUN apt install -y gnupg wget
+RUN apt update && apt upgrade -y
+RUN apt install -y gnupg wget curl
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | apt-key add -
 RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-5.0.list
 RUN apt update
@@ -26,13 +26,15 @@ VOLUME ["/data/db"]
 # Define working directory.
 WORKDIR /data
 
-EXPOSE 27017
+# Expose MongoDb outside of container
+#EXPOSE 27017
 
 # Define default command.
 CMD ["mongod"]
 #
 # Install Node.js
-RUN apt install -y nodejs npm
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt install -y nodejs
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -53,6 +55,3 @@ EXPOSE 3000
 
 ## Run the application
 CMD [ "node", "app.js" ]
-
-
-
