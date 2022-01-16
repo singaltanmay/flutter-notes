@@ -4,6 +4,21 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const mongoose = require('mongoose');
+
+const server = '127.0.0.1:27017';
+const database = 'flutter-notes-db';
+
+mongoose.connect(`mongodb://${server}/${database}`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Flutter Notes database connected!!');
+}).catch(err => {
+    console.log('Failed to connect to Flutter Notes database', err);
+});
+
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
