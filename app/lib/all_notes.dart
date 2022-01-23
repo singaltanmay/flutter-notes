@@ -55,7 +55,14 @@ class _AllNotesState extends State<AllNotes> {
       ));
     }
 
-    return ListView(
-        padding: const EdgeInsets.all(8), children: noteWidgetsList);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("All Notes"),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(8),
+        children: noteWidgetsList,
+      ),
+    );
   }
 }
