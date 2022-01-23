@@ -1,4 +1,4 @@
-name: Build Flutter App
+name: Build and Deploy Web App
 
 # source: https://gist.github.com/rodydavis/bde9a9a8c2fcdcf3474c0f50248f2e3a
 
@@ -31,28 +31,3 @@ jobs:
       with:
         branch: gh-pages # The branch the action should deploy to.
         folder: app/build/web # The folder the action should deploy.
-
-  build_apk:
-    name: Build Flutter (Android)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./app
-    steps:
-    - uses: actions/checkout@v1
-    - run: ls -lah
-    - uses: actions/setup-java@v1
-      with:
-        java-version: '12.x'
-    - uses: subosito/flutter-action@v1
-      with:
-          channel: 'dev'
-    - run: flutter pub get
-#     - run: flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
-#     - run: flutter build appbundle --target-platform android-arm,android-arm64
-    - run: flutter build appbundle
-    - name: Upload APK
-      uses: actions/upload-artifact@master
-      with:
-        name: apk-build
-        path: app/build/app/outputs/apk/release
