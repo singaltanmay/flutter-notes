@@ -25,17 +25,21 @@ jobs:
     - run: flutter pub get
     - run: flutter config --enable-web
     - run: flutter build web
-    - name: Archive Production Artifact
-      uses: actions/upload-artifact@master
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@v4.2.2
       with:
-        name: web-build
-        path: build/web
+        branch: gh-pages # The branch the action should deploy to.
+        folder: build/web # The folder the action should deploy.
 
   build_apk:
     name: Build Flutter (Android)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
     steps:
     - uses: actions/checkout@v1
+    - run: ls -lah
     - uses: actions/setup-java@v1
       with:
         java-version: '12.x'
