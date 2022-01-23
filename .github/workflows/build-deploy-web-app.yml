@@ -10,12 +10,35 @@ on:
     branches:
       - master
 jobs:
+
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.early.conclusion }}
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+      
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          src:
+            - 'app/**'
+  
+    - id: early
+      name: Check for any changes in app/ folder
+      run: if [[ ${{steps.changes.outputs.src}} == false ]]; then exit 1 ; fi
+
   build_web:
+    needs: check
     name: Build Flutter (Web)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./app
+        
+    if: needs.check.outputs.status == 'success'
     steps:
     - uses: actions/checkout@v1
     - run: ls -lah
