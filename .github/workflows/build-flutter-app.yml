@@ -25,11 +25,12 @@ jobs:
     - run: flutter pub get
     - run: flutter config --enable-web
     - run: flutter build web
+    - run: ls -lah
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4.2.2
       with:
         branch: gh-pages # The branch the action should deploy to.
-        folder: build/web # The folder the action should deploy.
+        folder: app/build/web # The folder the action should deploy.
 
   build_apk:
     name: Build Flutter (Android)
@@ -54,4 +55,4 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: apk-build
-        path: build/app/outputs/apk/release
+        path: app/build/app/outputs/apk/release
