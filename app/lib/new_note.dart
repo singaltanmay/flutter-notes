@@ -12,6 +12,7 @@ class _NewNoteState extends State<NewNote> {
   void postNewNote() {
     // TODO implement posting note to the server
     print('New Note Saved!');
+    Navigator.pop(context);
   }
 
   @override
