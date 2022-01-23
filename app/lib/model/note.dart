@@ -12,7 +12,7 @@ class Note {
 
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(
-      id: json['id'],
+      id: json['_id'],
       title: json['title'],
       body: json['body'],
       created: json['created'],
@@ -21,6 +21,6 @@ class Note {
 
   @override
   String toString() {
-    return 'Note{title: $title, body: $body, created: $created}';
+    return 'Note{id: $id, title: $title, body: $body, created: $created}';
   }
 }

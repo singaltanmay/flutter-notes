@@ -28,8 +28,8 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("All notes"),
+          title: const Text("All Notes"),
         ),
-        body: AllNotes());
+        body: const AllNotes());
   }
 }
