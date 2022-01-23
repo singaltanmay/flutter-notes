@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app/model/note.dart';
+import 'package:app/new_note.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -30,7 +31,7 @@ Future<List<Note>> fetchNotes() async {
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
-    throw Exception('Failed to load album');
+    throw Exception('Failed to load all notes');
   }
 }
 
@@ -58,6 +59,19 @@ class _AllNotesState extends State<AllNotes> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("All Notes"),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NewNote()),
+          ).then((value) => setState(() {
+                _loadNotes = true;
+              }));
+          // Respond to button press
+        },
+        icon: Icon(Icons.add),
+        label: Text('New Note'.toUpperCase()),
       ),
       body: ListView(
         padding: const EdgeInsets.all(8),

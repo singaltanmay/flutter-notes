@@ -1,14 +1,10 @@
 class Note {
-  final String id;
+  final String? id;
   final String title;
   final String body;
-  final String created;
+  String? created = DateTime.now().toString();
 
-  const Note(
-      {required this.id,
-      required this.title,
-      required this.body,
-      required this.created});
+  Note({this.id, required this.title, required this.body, this.created});
 
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(
@@ -22,5 +18,16 @@ class Note {
   @override
   String toString() {
     return 'Note{id: $id, title: $title, body: $body, created: $created}';
+  }
+
+  Map toMap() {
+    var map = new Map();
+    if (id != null) {
+      map["_id"] = id;
+    }
+    map["title"] = title;
+    map["body"] = body;
+    map["created"] = created ?? DateTime.now().toString();
+    return map;
   }
 }

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+import 'model/note.dart';
 
 class NewNote extends StatefulWidget {
   const NewNote({Key? key}) : super(key: key);
@@ -8,11 +11,26 @@ class NewNote extends StatefulWidget {
 }
 
 class _NewNoteState extends State<NewNote> {
+  TextEditingController titleController = TextEditingController();
+  TextEditingController bodyController = TextEditingController();
 
-  void postNewNote() {
-    // TODO implement posting note to the server
-    print('New Note Saved!');
-    Navigator.pop(context);
+  void postNewNote() async {
+    var note =
+        Note(title: this.titleController.text, body: this.bodyController.text);
+
+    final response = await http.post(Uri.parse('http://localhost:3000/'),
+        body: note.toMap());
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      print('Successfully POSTed Note $note\n');
+      Navigator.pop(context);
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception(
+          'Failed to POST Note $note. Response code = ${response.statusCode}\n');
+    }
   }
 
   @override
@@ -22,7 +40,8 @@ class _NewNoteState extends State<NewNote> {
         title: const Text("New Note"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.done_rounded), onPressed: postNewNote,
+            icon: const Icon(Icons.done_rounded),
+            onPressed: postNewNote,
           ),
         ],
       ),
@@ -32,6 +51,7 @@ class _NewNoteState extends State<NewNote> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TextFormField(
+              controller: titleController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'Title',
@@ -42,6 +62,7 @@ class _NewNoteState extends State<NewNote> {
             ),
             Expanded(
               child: TextFormField(
+                controller: bodyController,
                 maxLines: 1000,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
