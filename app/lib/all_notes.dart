@@ -15,29 +15,39 @@ class AllNotes extends StatefulWidget {
 
 var url = 'http://localhost:3000/';
 
-Future<List<Note>> fetchNotes() async {
-  final response = await http.get(Uri.parse(url), headers: {
-    "Accept": "application/json",
-    "Access-Control-Allow-Origin": "*"
-  });
+void printServerCommFailedError(){
+  print('Failed to communicate with server');
+}
 
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    final List responseList = jsonDecode(response.body);
-    List<Note> noteObjectsList = [];
-    for (var element in responseList) {
-      noteObjectsList.add(Note.fromJson(element));
+Future<List<Note>> fetchNotes() async {
+  try {
+    final response = await http.get(Uri.parse(url), headers: {
+      "Accept": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    });
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      final List responseList = jsonDecode(response.body);
+      List<Note> noteObjectsList = [];
+      for (var element in responseList) {
+        noteObjectsList.add(Note.fromJson(element));
+      }
+      return noteObjectsList;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      print('Failed to load all notes');
+      return [];
     }
-    return noteObjectsList;
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load all notes');
+  } on Exception {
+    printServerCommFailedError();
+    return [];
   }
 }
 
 Future<bool> deleteNote(String noteId) async {
+  try {
   final response = await http.delete(Uri.parse(url + noteId), headers: {
     "Accept": "application/json",
     "Access-Control-Allow-Origin": "*"
@@ -51,6 +61,10 @@ Future<bool> deleteNote(String noteId) async {
     // If the server did not return a 200 OK response,
     // then throw an exception.
     throw Exception('Failed to delete the note');
+  }
+  } on Exception {
+    printServerCommFailedError();
+    return false;
   }
 }
 
@@ -103,24 +117,24 @@ class _AllNotesState extends State<AllNotes> {
                 // Provide a function that tells the app
                 // what to do after an item has been swiped away.
                 onDismissed: (direction) {
-                  if(note.id == null){
+                  if (note.id == null) {
                     // Then show a snackbar.
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('"${note.title.substring(0, min(30, note.title.length))}..." cannot be deleted')));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            '"${note.title.substring(0, min(30, note.title.length))}..." cannot be deleted')));
                     return;
                   }
                   // Remove the item from the data source.
                   deleteNote(note.id!).then((value) => {
-                    if(!value){
-                      print("Note could not be deleted $note")
-                    }
-                  });
+                        if (!value) {print("Note could not be deleted $note")}
+                      });
                   setState(() {
                     _notes.removeAt(index);
                   });
                   // Then show a snackbar.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('"${note.title.substring(0, min(30, note.title.length))}..." deleted')));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          '"${note.title.substring(0, min(30, note.title.length))}..." deleted')));
                 },
                 child: ListTile(
                   title: Text(note.title),

@@ -21,7 +21,7 @@ class Note {
   }
 
   Map toMap() {
-    var map = new Map();
+    var map = Map();
     if (id != null) {
       map["_id"] = id;
     }
