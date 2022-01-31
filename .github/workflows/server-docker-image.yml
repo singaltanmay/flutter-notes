@@ -7,6 +7,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+  HEROKU_APP_NAME: ${{ 'flutter-notes' }}
 
 jobs:
 
@@ -61,3 +63,28 @@ jobs:
         push: true
         tags: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
         labels: ${{ steps.meta.outputs.labels }}
+        
+
+# https://enlear.academy/how-to-deploy-a-dockerized-web-app-to-heroku-using-the-github-actions-f16c00b19621
+  deploy:
+    needs: check
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+
+    # Clone the repository
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Build Docker image
+    - name: Docker build
+      run: docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
+
+    # Push the Docker image to Heroku Container Registry
+    - name: Publish
+      run: |
+        heroku container:push web -a $APP_NAME
+        heroku container:release web -a $APP_NAME
+    
