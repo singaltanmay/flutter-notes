@@ -4,7 +4,7 @@ This is the server for my notes application. It is built using ExpressJS and use
 
 
 ## Setup
-### 1. Pull the Docker image
+### 1. Pull the latest Docker image
 ```angular2html
 docker pull ghcr.io/singaltanmay/flutter-notes:latest
 ```
