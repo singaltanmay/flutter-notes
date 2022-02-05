@@ -4,14 +4,15 @@ import 'package:http/http.dart' as http;
 
 import '../model/note.dart';
 
-class NewNote extends StatefulWidget {
-  const NewNote({Key? key}) : super(key: key);
+class NoteEditor extends StatefulWidget {
+  final Note? note;
+  const NoteEditor({Key? key, Note? this.note}) : super(key: key);
 
   @override
-  _NewNoteState createState() => _NewNoteState();
+  _NoteEditorState createState() => _NoteEditorState();
 }
 
-class _NewNoteState extends State<NewNote> {
+class _NoteEditorState extends State<NoteEditor> {
   TextEditingController titleController = TextEditingController();
   TextEditingController bodyController = TextEditingController();
 
@@ -35,6 +36,11 @@ class _NewNoteState extends State<NewNote> {
 
   @override
   Widget build(BuildContext context) {
+    if(widget.note != null){
+      titleController.text = widget.note?.title ?? "";
+      bodyController.text = widget.note?.body ?? "";
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("New Note"),

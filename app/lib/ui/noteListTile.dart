@@ -2,14 +2,17 @@ import 'dart:io';
 
 import 'package:app/model/note.dart';
 import 'package:app/model/resourceUri.dart';
+import 'package:app/ui/noteEditor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class NoteListTile extends StatefulWidget {
   final Note note;
-  final onDelete;
+  final Function onDelete;
+  final Function onNoteEdited;
 
-  const NoteListTile({Key? key, required this.note, this.onDelete})
+  const NoteListTile(
+      {Key? key, required this.note, required this.onDelete, required this.onNoteEdited})
       : super(key: key);
 
   @override
@@ -48,10 +51,19 @@ class _NoteListTileState extends State<NoteListTile> {
   Widget build(BuildContext context) {
     String title = widget.note.title;
     String body = widget.note.body;
-    return Column(
-      children: [
-        Card(
-          clipBehavior: Clip.antiAlias,
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () =>
+          {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => NoteEditor(note: widget.note)),
+            ).then((value) => widget.onNoteEdited())
+          },
           child: Column(
             children: [
               ListTile(
@@ -63,35 +75,36 @@ class _NoteListTileState extends State<NoteListTile> {
                     )),
                 title: Text(title),
                 subtitle: Text(
-                  widget.note.created ?? "",
+                  DateTime.parse(
+                      widget.note.created ?? DateTime.now().toString())
+                      .toLocal()
+                      .toString(),
                   style: TextStyle(color: Colors.black.withOpacity(0.6)),
                 ),
-                trailing: RotatedBox(
-                  quarterTurns: 1,
-                  child: PopupMenuButton<int>(
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuItem<int>>[
-                            const PopupMenuItem<int>(
-                                value: 0, child: Text('Delete'))
-                          ],
-                      onSelected: (int value) {
-                        if (value == 0) {
-                          widget.delete().then((deleted) => {
-                                if (!deleted)
-                                  {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                            Text('Could not delete all notes'),
-                                      ),
-                                    ),
-                                  }
-                                else
-                                  widget.onDelete()
-                              });
-                        }
-                      }),
-                ),
+                trailing: PopupMenuButton<int>(
+                    itemBuilder: (BuildContext context) =>
+                    <PopupMenuItem<int>>[
+                      const PopupMenuItem<int>(
+                          value: 0, child: Text('Delete'))
+                    ],
+                    onSelected: (int value) {
+                      if (value == 0) {
+                        widget.delete().then((deleted) =>
+                        {
+                          if (!deleted)
+                            {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                  Text('Could not delete all notes'),
+                                ),
+                              ),
+                            }
+                          else
+                            widget.onDelete()
+                        });
+                      }
+                    }),
               ),
               Row(
                 children: [
@@ -122,7 +135,7 @@ class _NoteListTileState extends State<NoteListTile> {
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
