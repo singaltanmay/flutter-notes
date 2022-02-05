@@ -47,7 +47,7 @@ jobs:
           channel: 'stable'
     - run: flutter pub get
     - run: flutter config --enable-web
-    - run: flutter build web
+    - run: flutter build web --dart-define=DB_BASE_URL=https://flutter-notes.herokuapp.com/
     - run: ls -lah
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4.2.2
