@@ -9,7 +9,8 @@ class NoteListTile extends StatefulWidget {
   final Note note;
   final onDelete;
 
-  const NoteListTile({Key? key, required this.note, this.onDelete}) : super(key: key);
+  const NoteListTile({Key? key, required this.note, this.onDelete})
+      : super(key: key);
 
   @override
   _NoteListTileState createState() => _NoteListTileState();
@@ -54,19 +55,29 @@ class _NoteListTileState extends State<NoteListTile> {
           child: Column(
             children: [
               ListTile(
-                leading: Icon(Icons.arrow_drop_down_circle),
+                leading: Expanded(
+                    child: Container(
+                        padding: EdgeInsets.all(12.0),
+                        child: Icon(Icons.ac_unit_rounded, size: 32.0,))),
                 title: Text(title),
                 subtitle: Text(
                   widget.note.created ?? "",
                   style: TextStyle(color: Colors.black.withOpacity(0.6)),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  body,
-                  style: TextStyle(color: Colors.black.withOpacity(0.6)),
-                ),
+              Row(
+                children: [
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        body,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(color: Colors.black.withOpacity(0.6)),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               ButtonBar(
                 alignment: MainAxisAlignment.start,
