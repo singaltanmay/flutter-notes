@@ -74,6 +74,12 @@ class _AllNotesState extends State<AllNotes> {
   List<Note> _notes = [];
   bool _loadNotes = true;
 
+  void refreshNotesOnBuild() {
+    setState(() {
+      _loadNotes = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loadNotes) {
@@ -95,6 +101,7 @@ class _AllNotesState extends State<AllNotes> {
       appBar: AppBar(
         title: const Text("Flutter Notes"),
         actions: [
+          IconButton(onPressed: refreshNotesOnBuild, icon: Icon(Icons.refresh)),
           RotatedBox(
             quarterTurns: 1,
             child: PopupMenuButton<int>(
@@ -136,45 +143,49 @@ class _AllNotesState extends State<AllNotes> {
         icon: const Icon(Icons.add),
         label: Text('New Note'.toUpperCase()),
       ),
-      body: ListView.builder(
-        itemCount: _notes.length,
-        itemBuilder: (context, index) {
-          var note = _notes[index];
-          var noteListTile = NoteListTile(
-              note: note,
-              onNoteEdited: () => setState(() {
-                    _loadNotes = true;
-                  }),
-              onDelete: () => setState(() {
-                    _notes.removeAt(index);
-                  }));
-          return Dismissible(
-              // Each Dismissible must contain a Key. Keys allow Flutter to
-              // uniquely identify widgets.
-              key: Key(note.id!),
-              // Provide a function that tells the app
-              // what to do after an item has been swiped away.
-              onDismissed: (direction) {
-                if (note.id == null) {
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Future.delayed(Duration(seconds: 2));
+          refreshNotesOnBuild();
+        },
+        child: ListView.builder(
+          itemCount: _notes.length,
+          itemBuilder: (context, index) {
+            var note = _notes[index];
+            var noteListTile = NoteListTile(
+                note: note,
+                onNoteEdited: refreshNotesOnBuild,
+                onDelete: () => setState(() {
+                      _notes.removeAt(index);
+                    }));
+            return Dismissible(
+                // Each Dismissible must contain a Key. Keys allow Flutter to
+                // uniquely identify widgets.
+                key: Key(note.id!),
+                // Provide a function that tells the app
+                // what to do after an item has been swiped away.
+                onDismissed: (direction) {
+                  if (note.id == null) {
+                    // Then show a snackbar.
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            '"${note.title.substring(0, min(30, note.title.length))}..." cannot be deleted')));
+                    return;
+                  }
+                  // Remove the item from the data source.
+                  noteListTile.delete().then((value) => {
+                        if (!value)
+                          {stdout.writeln("Note could not be deleted $note")}
+                      });
+
                   // Then show a snackbar.
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(
-                          '"${note.title.substring(0, min(30, note.title.length))}..." cannot be deleted')));
-                  return;
-                }
-                // Remove the item from the data source.
-                noteListTile.delete().then((value) => {
-                      if (!value)
-                        {stdout.writeln("Note could not be deleted $note")}
-                    });
-
-                // Then show a snackbar.
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                        '"${note.title.substring(0, min(30, note.title.length))}..." deleted')));
-              },
-              child: noteListTile);
-        },
+                          '"${note.title.substring(0, min(30, note.title.length))}..." deleted')));
+                },
+                child: noteListTile);
+          },
+        ),
       ),
       bottomNavigationBar: AppBottomNavigationBar(
         initialPosition: AppBottomNavigationBar.HOME_POSITION,
