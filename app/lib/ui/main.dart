@@ -1,4 +1,4 @@
-import 'package:app/all_notes.dart';
+import 'package:app/ui/allNotes.dart';
 import 'package:flutter/material.dart';
 
 void main() {

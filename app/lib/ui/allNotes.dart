@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:app/model/note.dart';
-import 'package:app/new_note.dart';
+import 'package:app/model/resourceUri.dart';
+import 'package:app/ui/newNote.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -13,15 +15,13 @@ class AllNotes extends StatefulWidget {
   _AllNotesState createState() => _AllNotesState();
 }
 
-var url = 'http://localhost:3000/';
-
-void printServerCommFailedError(){
-  print('Failed to communicate with server');
+void printServerCommFailedError() {
+  stderr.writeln('Failed to communicate with server');
 }
 
 Future<List<Note>> fetchNotes() async {
   try {
-    final response = await http.get(Uri.parse(url), headers: {
+    final response = await http.get(ResourceUri.getBaseUri(), headers: {
       "Accept": "application/json",
       "Access-Control-Allow-Origin": "*"
     });
@@ -37,7 +37,7 @@ Future<List<Note>> fetchNotes() async {
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
-      print('Failed to load all notes');
+      stderr.writeln('Failed to load all notes');
       return [];
     }
   } on Exception {
@@ -48,20 +48,21 @@ Future<List<Note>> fetchNotes() async {
 
 Future<bool> deleteNote(String noteId) async {
   try {
-  final response = await http.delete(Uri.parse(url + noteId), headers: {
-    "Accept": "application/json",
-    "Access-Control-Allow-Origin": "*"
-  });
+    final response = await http.delete(ResourceUri.getNoteUri(noteId),
+        headers: {
+          "Accept": "application/json",
+          "Access-Control-Allow-Origin": "*"
+        });
 
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return true;
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to delete the note');
-  }
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      return true;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to delete the note');
+    }
   } on Exception {
     printServerCommFailedError();
     return false;
@@ -126,7 +127,8 @@ class _AllNotesState extends State<AllNotes> {
                   }
                   // Remove the item from the data source.
                   deleteNote(note.id!).then((value) => {
-                        if (!value) {print("Note could not be deleted $note")}
+                        if (!value)
+                          {stdout.writeln("Note could not be deleted $note")}
                       });
                   setState(() {
                     _notes.removeAt(index);

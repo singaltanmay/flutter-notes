@@ -1,7 +1,8 @@
+import 'package:app/model/resourceUri.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'model/note.dart';
+import '../model/note.dart';
 
 class NewNote extends StatefulWidget {
   const NewNote({Key? key}) : super(key: key);
@@ -18,12 +19,11 @@ class _NewNoteState extends State<NewNote> {
     var note =
         Note(title: this.titleController.text, body: this.bodyController.text);
 
-    final response = await http.post(Uri.parse('http://localhost:3000/'),
-        body: note.toMap());
+    final response =
+        await http.post(ResourceUri.getBaseUri(), body: note.toMap());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      print('Successfully POSTed Note $note\n');
       Navigator.pop(context);
     } else {
       // If the server did not return a 200 OK response,
