@@ -46,6 +46,28 @@ Future<List<Note>> fetchNotes() async {
   }
 }
 
+Future<bool> deleteAllNotes() async {
+  try {
+    final response = await http.delete(ResourceUri.getBaseUri(), headers: {
+      "Accept": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    });
+
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      return true;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to delete all notes');
+    }
+  } on Exception {
+    printServerCommFailedError();
+    return false;
+  }
+}
+
 Future<bool> deleteNote(String noteId) async {
   try {
     final response = await http.delete(ResourceUri.getNoteUri(noteId),
@@ -93,6 +115,34 @@ class _AllNotesState extends State<AllNotes> {
     return Scaffold(
         appBar: AppBar(
           title: const Text("All Notes"),
+          actions: [
+            RotatedBox(
+              quarterTurns: 1,
+              child: PopupMenuButton<int>(
+                  itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
+                        const PopupMenuItem<int>(
+                            value: 0, child: Text('Delete All'))
+                      ],
+                  onSelected: (int value) {
+                    if (value == 0) {
+                      deleteAllNotes().then((deleted) => {
+                            if (!deleted)
+                              {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Could not delete all notes'),
+                                  ),
+                                ),
+                              }
+                            else
+                              setState(() {
+                                _notes.clear();
+                              })
+                          });
+                    }
+                  }),
+            )
+          ],
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
