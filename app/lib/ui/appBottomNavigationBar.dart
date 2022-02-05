@@ -32,19 +32,19 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar> {
       },
       items: const [
         BottomNavigationBarItem(
-          title: Text('Home'),
+          label: 'Home',
           icon: Icon(Icons.home),
         ),
         BottomNavigationBarItem(
-          title: Text('Search'),
+          label: 'Search',
           icon: Icon(Icons.search),
         ),
         BottomNavigationBarItem(
-          title: Text('Starred'),
+          label: 'Starred',
           icon: Icon(Icons.star),
         ),
         BottomNavigationBarItem(
-          title: Text('Settings'),
+          label: 'Settings',
           icon: Icon(Icons.settings),
         ),
       ],
