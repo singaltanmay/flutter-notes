@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:app/model/note.dart';
 import 'package:app/model/resourceUri.dart';
 import 'package:app/ui/newNote.dart';
+import 'package:app/ui/noteListTile.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -61,29 +62,6 @@ Future<bool> deleteAllNotes() async {
       // If the server did not return a 200 OK response,
       // then throw an exception.
       throw Exception('Failed to delete all notes');
-    }
-  } on Exception {
-    printServerCommFailedError();
-    return false;
-  }
-}
-
-Future<bool> deleteNote(String noteId) async {
-  try {
-    final response = await http.delete(ResourceUri.getNoteUri(noteId),
-        headers: {
-          "Accept": "application/json",
-          "Access-Control-Allow-Origin": "*"
-        });
-
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      return true;
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to delete the note');
     }
   } on Exception {
     printServerCommFailedError();
@@ -161,6 +139,11 @@ class _AllNotesState extends State<AllNotes> {
           itemCount: _notes.length,
           itemBuilder: (context, index) {
             var note = _notes[index];
+            var noteListTile = NoteListTile(
+                note: note,
+                onDelete: () => setState(() {
+                      _notes.removeAt(index);
+                    }));
             return Dismissible(
                 // Each Dismissible must contain a Key. Keys allow Flutter to
                 // uniquely identify widgets.
@@ -176,22 +159,17 @@ class _AllNotesState extends State<AllNotes> {
                     return;
                   }
                   // Remove the item from the data source.
-                  deleteNote(note.id!).then((value) => {
+                  noteListTile.delete().then((value) => {
                         if (!value)
                           {stdout.writeln("Note could not be deleted $note")}
                       });
-                  setState(() {
-                    _notes.removeAt(index);
-                  });
+
                   // Then show a snackbar.
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(
                           '"${note.title.substring(0, min(30, note.title.length))}..." deleted')));
                 },
-                child: ListTile(
-                  title: Text(note.title),
-                  subtitle: Text(note.body),
-                ));
+                child: noteListTile);
           },
         ));
   }
