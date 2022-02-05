@@ -55,14 +55,42 @@ class _NoteListTileState extends State<NoteListTile> {
           child: Column(
             children: [
               ListTile(
-                leading: Expanded(
-                    child: Container(
-                        padding: EdgeInsets.all(12.0),
-                        child: Icon(Icons.ac_unit_rounded, size: 32.0,))),
+                leading: Container(
+                    padding: EdgeInsets.all(12.0),
+                    child: Icon(
+                      Icons.ac_unit_rounded,
+                      size: 32.0,
+                    )),
                 title: Text(title),
                 subtitle: Text(
                   widget.note.created ?? "",
                   style: TextStyle(color: Colors.black.withOpacity(0.6)),
+                ),
+                trailing: RotatedBox(
+                  quarterTurns: 1,
+                  child: PopupMenuButton<int>(
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuItem<int>>[
+                            const PopupMenuItem<int>(
+                                value: 0, child: Text('Delete'))
+                          ],
+                      onSelected: (int value) {
+                        if (value == 0) {
+                          widget.delete().then((deleted) => {
+                                if (!deleted)
+                                  {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Could not delete all notes'),
+                                      ),
+                                    ),
+                                  }
+                                else
+                                  widget.onDelete()
+                              });
+                        }
+                      }),
                 ),
               ),
               Row(
@@ -82,8 +110,7 @@ class _NoteListTileState extends State<NoteListTile> {
               ButtonBar(
                 alignment: MainAxisAlignment.start,
                 children: [
-                  FlatButton(
-                    textColor: const Color(0xFF6200EE),
+                  TextButton(
                     onPressed: () {
                       widget.delete();
                       widget.onDelete();
