@@ -42,6 +42,8 @@ app.get('/', getAllNotes)
 app.post('/', saveNote)
 app.delete('/', deleteAllNotes)
 app.delete('/:noteId', deleteNote)
+app.get('/user', getAllUsers)
+app.post('/user', signUpUser)
 app.get('/health', (_, res) => res.send(mongooseConnected))
 
 // catch 404 and forward to error handler
@@ -57,14 +59,11 @@ app.use(function (err, req, res, next) {
 
     // render the error page
     res.status(err.status || 500);
-    res.render('error');
+    res.send(JSON.stringify(err));
 });
 
-const noteSchema = new mongoose.Schema({
-    title: {type: String, required: true}, body: String, created: {type: Date, default: Date.now}
-})
-
-const Note = mongoose.model('Note', noteSchema);
+const Note = require('./schema/Note')
+const User = require('./schema/User')
 
 function getAllNotes(req, res, next) {
     Note.find().then(notes => {
@@ -80,7 +79,7 @@ function saveNote(req, res, next) {
         title: req.body.title, body: req.body.body
     });
     note.save()
-        .then(note => {
+        .then(_ => {
             res.sendStatus(200);
         }).catch(err => {
         next(err)
@@ -93,6 +92,30 @@ function deleteAllNotes(req, res, next) {
 
 function deleteNote(req, res, next) {
     Note.deleteOne({'_id': req.params.noteId}).then(res.sendStatus(200)).catch(next)
+}
+
+function getAllUsers(req, res, next) {
+    User.find().then(users => {
+        res.send(users)
+    }).catch(err => {
+        next(err)
+    });
+}
+
+function signUpUser(req, res, next) {
+    const user = new User({
+        username: req.body.username,
+        password: req.body.password,
+        securityQuestion: req.body.securityQuestion,
+        securityQuestionAnswer: req.body.securityQuestionAnswer
+    });
+    user.save()
+        .then(_ => {
+            res.sendStatus(200);
+        }).catch(err => {
+        console.log(err)
+        next(err)
+    });
 }
 
 module.exports = app;
