@@ -42,6 +42,7 @@ app.get('/', getAllNotes)
 app.post('/', saveNote)
 app.delete('/', deleteAllNotes)
 app.delete('/:noteId', deleteNote)
+app.put('/', updateNote)
 app.get('/user', getAllUsers)
 app.post('/user', signUpUser)
 app.get('/health', (_, res) => res.send(mongooseConnected))
@@ -74,16 +75,36 @@ function getAllNotes(req, res, next) {
     });
 }
 
-function saveNote(req, res, next) {
+function saveNote({body}, res, next) {
     const note = new Note({
-        title: req.body.title, body: req.body.body
-    });
+        title: body.title,
+        body: body.body,
+        created: body.created
+    })
     note.save()
         .then(_ => {
             res.sendStatus(200);
         }).catch(err => {
         next(err)
     });
+}
+
+async function updateNote({body}, res, next) {
+    const oldNote = await Note.findById(body._id);
+    if(oldNote == null){
+        res.sendStatus(404)
+        return;
+    }
+    Note.updateOne({'_id': body._id}, {
+        'title': body.title || oldNote['title'],
+        'body': body.body || oldNote['body'],
+        'created': body.created || oldNote['created'],
+    }).then(_ => {
+        res.sendStatus(200);
+    }).catch(err => {
+        console.log(err)
+        next(err)
+    })
 }
 
 function deleteAllNotes(req, res, next) {
