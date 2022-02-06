@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AppBottomNavigationBar extends StatefulWidget {
-  int initialPosition = HOME_POSITION;
-  static int HOME_POSITION = 0;
-  static int SEARCH_POSITION = 1;
-  static int STARRED_POSITION = 2;
-  static int SETTINGS_POSITION = 3;
+  final int initialPosition;
+  static const int HOME_POSITION = 0;
+  static const int SEARCH_POSITION = 1;
+  static const int STARRED_POSITION = 2;
+  static const int SETTINGS_POSITION = 3;
 
-  AppBottomNavigationBar({Key? key, this.initialPosition = 0})
+  const AppBottomNavigationBar({Key? key, this.initialPosition = HOME_POSITION})
       : super(key: key);
 
   @override
@@ -21,7 +21,7 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar> {
   Widget build(BuildContext context) {
     // initialize _currentIndex
     if (_currentIndex == -1) {
-         _currentIndex = widget.initialPosition;
+      _currentIndex = widget.initialPosition;
     }
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,

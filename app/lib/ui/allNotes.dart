@@ -101,7 +101,8 @@ class _AllNotesState extends State<AllNotes> {
       appBar: AppBar(
         title: const Text("Flutter Notes"),
         actions: [
-          IconButton(onPressed: refreshNotesOnBuild, icon: Icon(Icons.refresh)),
+          IconButton(
+              onPressed: refreshNotesOnBuild, icon: const Icon(Icons.refresh)),
           RotatedBox(
             quarterTurns: 1,
             child: PopupMenuButton<int>(
@@ -145,7 +146,7 @@ class _AllNotesState extends State<AllNotes> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await Future.delayed(Duration(seconds: 2));
+          await Future.delayed(const Duration(seconds: 2));
           refreshNotesOnBuild();
         },
         child: ListView.builder(

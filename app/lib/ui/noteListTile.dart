@@ -68,8 +68,8 @@ class _NoteListTileState extends State<NoteListTile> {
             children: [
               ListTile(
                 leading: Container(
-                    padding: EdgeInsets.all(12.0),
-                    child: Icon(
+                    padding: const EdgeInsets.all(12.0),
+                    child: const Icon(
                       Icons.ac_unit_rounded,
                       size: 32.0,
                     )),

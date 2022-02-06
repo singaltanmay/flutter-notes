@@ -6,7 +6,8 @@ import '../model/note.dart';
 
 class NoteEditor extends StatefulWidget {
   final Note? note;
-  const NoteEditor({Key? key, Note? this.note}) : super(key: key);
+
+  const NoteEditor({Key? key, this.note}) : super(key: key);
 
   @override
   _NoteEditorState createState() => _NoteEditorState();
@@ -17,8 +18,7 @@ class _NoteEditorState extends State<NoteEditor> {
   TextEditingController bodyController = TextEditingController();
 
   void postNewNote() async {
-    var note =
-        Note(title: this.titleController.text, body: this.bodyController.text);
+    var note = Note(title: titleController.text, body: bodyController.text);
 
     final response =
         await http.post(ResourceUri.getBaseUri(), body: note.toMap());
@@ -34,9 +34,29 @@ class _NoteEditorState extends State<NoteEditor> {
     }
   }
 
+  void updateNote() async {
+    var note = Note(
+        id: widget.note?.id,
+        title: titleController.text,
+        body: bodyController.text);
+
+    final response =
+        await http.put(ResourceUri.getBaseUri(), body: note.toMap());
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      Navigator.pop(context);
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception(
+          'Failed to PUT Note $note. Response code = ${response.statusCode}\n');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if(widget.note != null){
+    if (widget.note != null) {
       titleController.text = widget.note?.title ?? "";
       bodyController.text = widget.note?.body ?? "";
     }
@@ -46,13 +66,17 @@ class _NoteEditorState extends State<NoteEditor> {
         title: const Text("New Note"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.done_rounded),
-            onPressed: postNewNote,
-          ),
+              icon: const Icon(Icons.done_rounded),
+              onPressed: () => {
+                    if (widget.note != null && widget.note?.id != null)
+                      {updateNote()}
+                    else
+                      postNewNote()
+                  }),
         ],
       ),
       body: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
