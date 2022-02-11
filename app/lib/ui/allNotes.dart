@@ -188,7 +188,7 @@ class _AllNotesState extends State<AllNotes> {
           },
         ),
       ),
-      bottomNavigationBar: AppBottomNavigationBar(
+      bottomNavigationBar: const AppBottomNavigationBar(
         initialPosition: AppBottomNavigationBar.HOME_POSITION,
       ),
     );

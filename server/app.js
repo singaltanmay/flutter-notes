@@ -75,12 +75,16 @@ function getAllNotes(req, res, next) {
     });
 }
 
-function saveNote({body}, res, next) {
+async function saveNote({body}, res, next) {
     const note = new Note({
         title: body.title,
         body: body.body,
         created: body.created
     })
+    const creator = await User.findById(body.creator)
+    if (creator != null) {
+        note.creator = creator
+    }
     note.save()
         .then(_ => {
             res.sendStatus(200);
@@ -91,7 +95,7 @@ function saveNote({body}, res, next) {
 
 async function updateNote({body}, res, next) {
     const oldNote = await Note.findById(body._id);
-    if(oldNote == null){
+    if (oldNote == null) {
         res.sendStatus(404)
         return;
     }
@@ -99,6 +103,7 @@ async function updateNote({body}, res, next) {
         'title': body.title || oldNote['title'],
         'body': body.body || oldNote['body'],
         'created': body.created || oldNote['created'],
+        'creator': body.creator || oldNote['creator']
     }).then(_ => {
         res.sendStatus(200);
     }).catch(err => {
