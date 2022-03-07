@@ -82,7 +82,12 @@ async function saveNote({body}, res, next) {
         created: body.created
     })
     const creator = await User.findById(body.creator)
-    if (creator != null) {
+    if (creator == null) {
+        let errorMsg = "Cannot save note without a valid creator";
+        console.log(errorMsg + "\n" + note)
+        res.status(400).send(errorMsg);
+        next()
+    } else {
         note.creator = creator
     }
     note.save()
@@ -137,7 +142,7 @@ function signUpUser(req, res, next) {
     });
     user.save()
         .then(_ => {
-            res.sendStatus(200);
+            res.status(200).send(user._id);
         }).catch(err => {
         console.log(err)
         next(err)

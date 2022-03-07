@@ -50,7 +50,7 @@ class _NoteListTileState extends State<NoteListTile> {
   @override
   Widget build(BuildContext context) {
     String title = widget.note.title;
-    String body = widget.note.body;
+    String body = widget.note.body + " -- @" + widget.note.creator;
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Card(

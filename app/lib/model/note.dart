@@ -3,8 +3,9 @@ class Note {
   final String title;
   final String body;
   String? created = DateTime.now().toString();
+  final String creator;
 
-  Note({this.id, required this.title, required this.body, this.created});
+  Note({this.id, required this.title, required this.body, this.created, required this.creator});
 
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(
@@ -12,12 +13,13 @@ class Note {
       title: json['title'],
       body: json['body'],
       created: json['created'],
+      creator: json['creator']
     );
   }
 
   @override
   String toString() {
-    return 'Note{id: $id, title: $title, body: $body, created: $created}';
+    return 'Note{id: $id, title: $title, body: $body, created: $created, creator: $creator}';
   }
 
   Map toMap() {
@@ -28,6 +30,7 @@ class Note {
     map["title"] = title;
     map["body"] = body;
     map["created"] = created ?? DateTime.now().toString();
+    map["creator"] = creator;
     return map;
   }
 }
