@@ -7,6 +7,7 @@ import 'package:app/model/resourceUri.dart';
 import 'package:app/ui/appBottomNavigationBar.dart';
 import 'package:app/ui/noteEditor.dart';
 import 'package:app/ui/noteListTile.dart';
+import 'package:app/ui/signin.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -83,7 +84,8 @@ class _AllNotesState extends State<AllNotes> {
   @override
   Widget build(BuildContext context) {
     if (_loadNotes) {
-      fetchNotes().then((value) => setState(() {
+      fetchNotes().then((value) =>
+          setState(() {
             _loadNotes = false;
             _notes = value;
           }));
@@ -106,26 +108,36 @@ class _AllNotesState extends State<AllNotes> {
           RotatedBox(
             quarterTurns: 1,
             child: PopupMenuButton<int>(
-                itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
-                      const PopupMenuItem<int>(
-                          value: 0, child: Text('Delete All'))
-                    ],
+                itemBuilder: (BuildContext context) =>
+                <PopupMenuItem<int>>[
+                  const PopupMenuItem<int>(
+                      value: 0, child: Text('Delete All')),
+                  const PopupMenuItem<int>(
+                      value: 1, child: Text('Sign Out'))
+                ],
                 onSelected: (int value) {
                   if (value == 0) {
-                    deleteAllNotes().then((deleted) => {
-                          if (!deleted)
-                            {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Could not delete all notes'),
-                                ),
-                              ),
-                            }
-                          else
-                            setState(() {
-                              _notes.clear();
-                            })
-                        });
+                    deleteAllNotes().then((deleted) =>
+                    {
+                      if (!deleted)
+                        {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Could not delete all notes'),
+                            ),
+                          ),
+                        }
+                      else
+                        setState(() {
+                          _notes.clear();
+                        })
+                    });
+                  }
+                  if (value == 1) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignIn()),
+                    );
                   }
                 }),
           )
@@ -136,7 +148,8 @@ class _AllNotesState extends State<AllNotes> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const NoteEditor()),
-          ).then((value) => setState(() {
+          ).then((value) =>
+              setState(() {
                 _loadNotes = true;
               }));
           // Respond to button press
@@ -156,12 +169,13 @@ class _AllNotesState extends State<AllNotes> {
             var noteListTile = NoteListTile(
                 note: note,
                 onNoteEdited: refreshNotesOnBuild,
-                onDelete: () => setState(() {
+                onDelete: () =>
+                    setState(() {
                       _notes.removeAt(index);
                     }));
             return Dismissible(
-                // Each Dismissible must contain a Key. Keys allow Flutter to
-                // uniquely identify widgets.
+              // Each Dismissible must contain a Key. Keys allow Flutter to
+              // uniquely identify widgets.
                 key: Key(note.id!),
                 // Provide a function that tells the app
                 // what to do after an item has been swiped away.
@@ -170,19 +184,22 @@ class _AllNotesState extends State<AllNotes> {
                     // Then show a snackbar.
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
-                            '"${note.title.substring(0, min(30, note.title.length))}..." cannot be deleted')));
+                            '"${note.title.substring(0, min(30,
+                                note.title.length))}..." cannot be deleted')));
                     return;
                   }
                   // Remove the item from the data source.
-                  noteListTile.delete().then((value) => {
-                        if (!value)
-                          {stdout.writeln("Note could not be deleted $note")}
-                      });
+                  noteListTile.delete().then((value) =>
+                  {
+                    if (!value)
+                      {stdout.writeln("Note could not be deleted $note")}
+                  });
 
                   // Then show a snackbar.
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(
-                          '"${note.title.substring(0, min(30, note.title.length))}..." deleted')));
+                          '"${note.title.substring(0, min(30,
+                              note.title.length))}..." deleted')));
                 },
                 child: noteListTile);
           },
