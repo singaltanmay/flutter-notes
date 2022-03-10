@@ -136,7 +136,7 @@ async function signInUser(req, res, next) {
     await User.findOne({
         'username': req.body.username, 'password': req.body.password
     }).then(user => {
-        res.status(200).send(user._id);
+        res.status(200).send(user._id.toString());
     }).catch(err => {
         console.log(err)
         next(err)
@@ -152,7 +152,7 @@ function signUpUser(req, res, next) {
     });
     user.save()
         .then(_ => {
-            res.status(200).send(user._id);
+            res.status(200).send(user._id.toString());
         }).catch(err => {
         console.log(err)
         next(err)
