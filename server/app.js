@@ -79,7 +79,7 @@ function getAllNotes(req, res, next) {
 
 async function saveNote({body}, res, next) {
     const note = new Note({
-        title: body.title, body: body.body, created: body.created
+        title: body.title, body: body.body, created: body.created, starred: body.starred
     })
     const creator = await User.findById(body.creator)
     if (creator == null) {
@@ -108,7 +108,8 @@ async function updateNote({body}, res, next) {
         'title': body.title || oldNote['title'],
         'body': body.body || oldNote['body'],
         'created': body.created || oldNote['created'],
-        'creator': body.creator || oldNote['creator']
+        'creator': body.creator || oldNote['creator'],
+        'starred': body.starred || oldNote['starred']
     }).then(_ => {
         res.sendStatus(200);
     }).catch(err => {

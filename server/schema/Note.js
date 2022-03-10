@@ -14,6 +14,10 @@ const noteSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'creator',
         required: true
+    },
+    starred: {
+        type: Boolean,
+        default: false
     }
 })
 
