@@ -45,6 +45,7 @@ app.delete('/:noteId', deleteNote)
 app.put('/', updateNote)
 app.get('/user', getAllUsers)
 app.post('/user', signUpUser)
+app.get('/signin', signInUser)
 app.get('/health', (_, res) => res.send(mongooseConnected))
 
 // catch 404 and forward to error handler
@@ -77,9 +78,7 @@ function getAllNotes(req, res, next) {
 
 async function saveNote({body}, res, next) {
     const note = new Note({
-        title: body.title,
-        body: body.body,
-        created: body.created
+        title: body.title, body: body.body, created: body.created
     })
     const creator = await User.findById(body.creator)
     if (creator == null) {
@@ -129,6 +128,17 @@ function getAllUsers(req, res, next) {
     User.find().then(users => {
         res.send(users)
     }).catch(err => {
+        next(err)
+    });
+}
+
+async function signInUser(req, res, next) {
+    await User.findOne({
+        'username': req.body.username, 'password': req.body.password
+    }).then(_ => {
+        res.status(200).send(user._id);
+    }).catch(err => {
+        console.log(err)
         next(err)
     });
 }
