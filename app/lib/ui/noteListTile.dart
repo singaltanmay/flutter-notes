@@ -24,7 +24,7 @@ class NoteListTile extends StatefulWidget {
 
   Future<bool> delete() async {
     try {
-      final response = await http.delete(ResourceUri.getNoteUri(note.id!),
+      final response = await http.delete(ResourceUri.getAppendedUri(note.id!),
           headers: {
             "Accept": "application/json",
             "Access-Control-Allow-Origin": "*"

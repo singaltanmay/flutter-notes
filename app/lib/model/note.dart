@@ -23,7 +23,7 @@ class Note {
   }
 
   Map toMap() {
-    var map = Map();
+    var map = {};
     if (id != null) {
       map["_id"] = id;
     }
