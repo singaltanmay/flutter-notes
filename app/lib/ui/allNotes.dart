@@ -4,9 +4,9 @@ import 'dart:math';
 
 import 'package:app/model/note.dart';
 import 'package:app/model/resourceUri.dart';
-import 'package:app/ui/appBottomNavigationBar.dart';
+import 'package:app/widgets/appBottomNavigationBar.dart';
 import 'package:app/ui/noteEditor.dart';
-import 'package:app/ui/noteListTile.dart';
+import 'package:app/widgets/noteListTile.dart';
 import 'package:app/ui/signin.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;

@@ -1,10 +1,11 @@
 import 'package:app/model/resourceUri.dart';
 import 'package:app/ui/allNotes.dart';
 import 'package:app/ui/signup.dart';
+import 'package:app/widgets/inputField.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'logo.dart';
+import '../widgets/logo.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -69,18 +70,18 @@ class _SignInState extends State<SignIn> {
               children: [
                 Logo(),
                 _logoText(),
-                _inputField(
-                    const Icon(Icons.person_outline,
+                InputField(
+                    prefixIcon: const Icon(Icons.person_outline,
                         size: 30, color: Color(0xffA6B0BD)),
-                    "Username",
-                    false,
-                    usernameController),
-                _inputField(
-                    const Icon(Icons.lock_outline,
+                    hintText: "Username",
+                    isPassword: false,
+                    controller: usernameController),
+                InputField(
+                    prefixIcon: const Icon(Icons.lock_outline,
                         size: 30, color: Color(0xffA6B0BD)),
-                    "Password",
-                    true,
-                    passwordController),
+                    hintText: "Password",
+                    isPassword: true,
+                    controller: passwordController),
                 _signinBtn(context),
                 const Text("Don't have an account?"),
                 _signUp(context),
@@ -108,14 +109,12 @@ class _SignInState extends State<SignIn> {
             ),
           ]),
       child: FlatButton(
-        onPressed: () => {
-          onSignInPressed(() => {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => AllNotes()),
-                )
-              })
-        },
+        onPressed: () => onSignInPressed(() => {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => AllNotes()),
+              )
+            }),
         textColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 25),
         child: const Text("SIGN IN"),
@@ -133,55 +132,6 @@ Widget _signUp(BuildContext context) {
       )
     },
     child: const Text("SIGN UP NOW"),
-  );
-}
-
-Widget _inputField(Icon prefixIcon, String hintText, bool isPassword,
-    TextEditingController controller) {
-  return Container(
-    decoration: const BoxDecoration(
-      borderRadius: BorderRadius.all(
-        Radius.circular(50),
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black,
-          blurRadius: 25,
-          offset: Offset(0, 5),
-          spreadRadius: -25,
-        ),
-      ],
-    ),
-    margin: const EdgeInsets.only(bottom: 20),
-    child: TextField(
-      controller: controller,
-      obscureText: isPassword,
-      decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 25),
-        hintText: hintText,
-        hintStyle: const TextStyle(
-          color: Color(0xffA6B0BD),
-        ),
-        fillColor: Colors.white,
-        filled: true,
-        prefixIcon: prefixIcon,
-        prefixIconConstraints: const BoxConstraints(
-          minWidth: 75,
-        ),
-        enabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(50),
-          ),
-          borderSide: BorderSide(color: Colors.white),
-        ),
-        focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(50),
-          ),
-          borderSide: BorderSide(color: Colors.white),
-        ),
-      ),
-    ),
   );
 }
 
