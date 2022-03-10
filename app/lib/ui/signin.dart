@@ -1,9 +1,11 @@
+import 'package:app/model/constants.dart';
 import 'package:app/model/resourceUri.dart';
 import 'package:app/ui/allNotes.dart';
 import 'package:app/ui/signup.dart';
 import 'package:app/widgets/inputField.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/logo.dart';
 
@@ -45,7 +47,8 @@ class _SignInState extends State<SignIn> {
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      print(response.body);
+      var prefs = await SharedPreferences.getInstance();
+      prefs.setString(Constants.USER_TOKEN_KEY, response.body);
       callback();
     } else {
       // If the server did not return a 200 OK response,

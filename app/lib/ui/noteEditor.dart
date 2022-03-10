@@ -1,6 +1,8 @@
+import 'package:app/model/constants.dart';
 import 'package:app/model/resourceUri.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/note.dart';
 
@@ -16,9 +18,9 @@ class NoteEditor extends StatefulWidget {
 class _NoteEditorState extends State<NoteEditor> {
   TextEditingController titleController = TextEditingController();
   TextEditingController bodyController = TextEditingController();
-  String currentUser = "6225b1737e3181ef20093469";
 
   void postNewNote() async {
+    String currentUser = await getCurrentUserToken();
     var note = Note(
         title: titleController.text,
         body: bodyController.text,
@@ -39,6 +41,7 @@ class _NoteEditorState extends State<NoteEditor> {
   }
 
   void updateNote() async {
+    String currentUser = await getCurrentUserToken();
     var note = Note(
         id: widget.note?.id,
         title: titleController.text,
@@ -57,6 +60,15 @@ class _NoteEditorState extends State<NoteEditor> {
       throw Exception(
           'Failed to PUT Note $note. Response code = ${response.statusCode}\n');
     }
+  }
+
+  Future<String> getCurrentUserToken() async {
+    var prefs = await SharedPreferences.getInstance();
+    String? currentUser = prefs.getString(Constants.USER_TOKEN_KEY);
+    if (currentUser == null) {
+      throw Exception('User Token not found in Shared Preferences!');
+    }
+    return currentUser;
   }
 
   @override
