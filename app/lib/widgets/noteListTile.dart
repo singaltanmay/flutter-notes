@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app/model/note.dart';
@@ -10,8 +11,9 @@ class NoteListTile extends StatefulWidget {
   final Note note;
   final Function onDelete;
   final Function onNoteEdited;
+  String? noteCreatorUsername;
 
-  const NoteListTile(
+  NoteListTile(
       {Key? key,
       required this.note,
       required this.onDelete,
@@ -50,10 +52,34 @@ class NoteListTile extends StatefulWidget {
 }
 
 class _NoteListTileState extends State<NoteListTile> {
+  Future<String?> getNoteCreatorUsername(String creatorId) async {
+    final response =
+        await http.get(ResourceUri.getAppendedUri("user/" + creatorId));
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      final Map responseBody = jsonDecode(response.body);
+      return responseBody["username"];
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String title = widget.note.title;
-    String body = widget.note.body + " -- @" + widget.note.creator;
+    String body = widget.note.body;
+
+    if (widget.noteCreatorUsername == null) {
+      getNoteCreatorUsername(widget.note.creator).then((value) => {
+            setState(() {
+              widget.noteCreatorUsername = value;
+            })
+          });
+    }
+
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Card(
@@ -112,7 +138,9 @@ class _NoteListTileState extends State<NoteListTile> {
                     child: Container(
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
-                        body,
+                        widget.noteCreatorUsername != null
+                            ? body + " -- @" + widget.noteCreatorUsername!
+                            : body,
                         textAlign: TextAlign.start,
                         style: TextStyle(color: Colors.black.withOpacity(0.6)),
                       ),
