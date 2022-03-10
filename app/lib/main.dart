@@ -27,6 +27,6 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: SignIn());
+    return const Scaffold(body: SignIn());
   }
 }

@@ -13,4 +13,11 @@ const userSchema = new mongoose.Schema({
     securityQuestionAnswer: String
 })
 
+userSchema.methods.redactedJson = function () {
+    return {
+        "_id": this._id,
+        "username": this.username
+    }
+}
+
 module.exports = mongoose.model('User', userSchema);

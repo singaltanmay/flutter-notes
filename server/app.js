@@ -44,6 +44,7 @@ app.delete('/', deleteAllNotes)
 app.delete('/:noteId', deleteNote)
 app.put('/', updateNote)
 app.get('/user', getAllUsers)
+app.get('/user/:userId', getUserById)
 app.post('/user', signUpUser)
 app.post('/signin', signInUser)
 app.get('/health', (_, res) => res.send(mongooseConnected))
@@ -126,10 +127,22 @@ function deleteNote(req, res, next) {
 
 function getAllUsers(req, res, next) {
     User.find().then(users => {
-        res.send(users)
+        let redactedUsers = []
+        users.forEach(user => redactedUsers.push(user.redactedJson()));
+        res.send(redactedUsers)
     }).catch(err => {
         next(err)
     });
+}
+
+function getUserById(req, res, next) {
+    User.findById(req.params.userId).then(user => {
+        res.status(200).send(user.redactedJson());
+    }).catch(err => {
+        console.log(err)
+        res.status(404).send()
+        next(err)
+    })
 }
 
 async function signInUser(req, res, next) {
