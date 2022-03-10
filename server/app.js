@@ -45,7 +45,7 @@ app.delete('/:noteId', deleteNote)
 app.put('/', updateNote)
 app.get('/user', getAllUsers)
 app.post('/user', signUpUser)
-app.get('/signin', signInUser)
+app.post('/signin', signInUser)
 app.get('/health', (_, res) => res.send(mongooseConnected))
 
 // catch 404 and forward to error handler
@@ -135,7 +135,7 @@ function getAllUsers(req, res, next) {
 async function signInUser(req, res, next) {
     await User.findOne({
         'username': req.body.username, 'password': req.body.password
-    }).then(_ => {
+    }).then(user => {
         res.status(200).send(user._id);
     }).catch(err => {
         console.log(err)
