@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Notes',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.amber
+        primarySwatch: Colors.blue
       ),
       home: const MyHomePage(),
     );
