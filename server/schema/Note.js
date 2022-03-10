@@ -12,7 +12,8 @@ const noteSchema = new mongoose.Schema({
     },
     creator: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'creator'
+        ref: 'creator',
+        required: true
     }
 })
 

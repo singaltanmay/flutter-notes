@@ -12,7 +12,10 @@ class NoteListTile extends StatefulWidget {
   final Function onNoteEdited;
 
   const NoteListTile(
-      {Key? key, required this.note, required this.onDelete, required this.onNoteEdited})
+      {Key? key,
+      required this.note,
+      required this.onDelete,
+      required this.onNoteEdited})
       : super(key: key);
 
   @override
@@ -24,7 +27,7 @@ class NoteListTile extends StatefulWidget {
 
   Future<bool> delete() async {
     try {
-      final response = await http.delete(ResourceUri.getNoteUri(note.id!),
+      final response = await http.delete(ResourceUri.getAppendedUri(note.id!),
           headers: {
             "Accept": "application/json",
             "Access-Control-Allow-Origin": "*"
@@ -50,14 +53,13 @@ class _NoteListTileState extends State<NoteListTile> {
   @override
   Widget build(BuildContext context) {
     String title = widget.note.title;
-    String body = widget.note.body;
+    String body = widget.note.body + " -- @" + widget.note.creator;
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () =>
-          {
+          onTap: () => {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -76,33 +78,31 @@ class _NoteListTileState extends State<NoteListTile> {
                 title: Text(title),
                 subtitle: Text(
                   DateTime.parse(
-                      widget.note.created ?? DateTime.now().toString())
+                          widget.note.created ?? DateTime.now().toString())
                       .toLocal()
                       .toString(),
                   style: TextStyle(color: Colors.black.withOpacity(0.6)),
                 ),
                 trailing: PopupMenuButton<int>(
-                    itemBuilder: (BuildContext context) =>
-                    <PopupMenuItem<int>>[
-                      const PopupMenuItem<int>(
-                          value: 0, child: Text('Delete'))
-                    ],
+                    itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
+                          const PopupMenuItem<int>(
+                              value: 0, child: Text('Delete'))
+                        ],
                     onSelected: (int value) {
                       if (value == 0) {
-                        widget.delete().then((deleted) =>
-                        {
-                          if (!deleted)
-                            {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content:
-                                  Text('Could not delete all notes'),
-                                ),
-                              ),
-                            }
-                          else
-                            widget.onDelete()
-                        });
+                        widget.delete().then((deleted) => {
+                              if (!deleted)
+                                {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text('Could not delete all notes'),
+                                    ),
+                                  ),
+                                }
+                              else
+                                widget.onDelete()
+                            });
                       }
                     }),
               ),

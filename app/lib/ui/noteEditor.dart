@@ -16,9 +16,13 @@ class NoteEditor extends StatefulWidget {
 class _NoteEditorState extends State<NoteEditor> {
   TextEditingController titleController = TextEditingController();
   TextEditingController bodyController = TextEditingController();
+  String currentUser = "6225b1737e3181ef20093469";
 
   void postNewNote() async {
-    var note = Note(title: titleController.text, body: bodyController.text);
+    var note = Note(
+        title: titleController.text,
+        body: bodyController.text,
+        creator: currentUser);
 
     final response =
         await http.post(ResourceUri.getBaseUri(), body: note.toMap());
@@ -38,7 +42,8 @@ class _NoteEditorState extends State<NoteEditor> {
     var note = Note(
         id: widget.note?.id,
         title: titleController.text,
-        body: bodyController.text);
+        body: bodyController.text,
+        creator: currentUser);
 
     final response =
         await http.put(ResourceUri.getBaseUri(), body: note.toMap());

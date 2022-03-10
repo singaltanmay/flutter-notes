@@ -45,6 +45,7 @@ app.delete('/:noteId', deleteNote)
 app.put('/', updateNote)
 app.get('/user', getAllUsers)
 app.post('/user', signUpUser)
+app.post('/signin', signInUser)
 app.get('/health', (_, res) => res.send(mongooseConnected))
 
 // catch 404 and forward to error handler
@@ -77,12 +78,15 @@ function getAllNotes(req, res, next) {
 
 async function saveNote({body}, res, next) {
     const note = new Note({
-        title: body.title,
-        body: body.body,
-        created: body.created
+        title: body.title, body: body.body, created: body.created
     })
     const creator = await User.findById(body.creator)
-    if (creator != null) {
+    if (creator == null) {
+        let errorMsg = "Cannot save note without a valid creator";
+        console.log(errorMsg + "\n" + note)
+        res.status(400).send(errorMsg);
+        next()
+    } else {
         note.creator = creator
     }
     note.save()
@@ -128,6 +132,17 @@ function getAllUsers(req, res, next) {
     });
 }
 
+async function signInUser(req, res, next) {
+    await User.findOne({
+        'username': req.body.username, 'password': req.body.password
+    }).then(user => {
+        res.status(200).send(user._id);
+    }).catch(err => {
+        console.log(err)
+        next(err)
+    });
+}
+
 function signUpUser(req, res, next) {
     const user = new User({
         username: req.body.username,
@@ -137,7 +152,7 @@ function signUpUser(req, res, next) {
     });
     user.save()
         .then(_ => {
-            res.sendStatus(200);
+            res.status(200).send(user._id);
         }).catch(err => {
         console.log(err)
         next(err)
