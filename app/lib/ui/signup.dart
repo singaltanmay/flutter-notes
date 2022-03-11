@@ -85,7 +85,7 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
-  Widget _singupBtn() {
+  Widget _signupBtn() {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 20, bottom: 50),
@@ -155,7 +155,7 @@ class _SignUpState extends State<SignUp> {
                     hintText: "Security Question Answer",
                     isPassword: false,
                     controller: securityQuestionAnswerController),
-                _singupBtn(),
+                _signupBtn(),
               ],
             ),
           ),

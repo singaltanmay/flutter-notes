@@ -30,4 +30,10 @@ class ResourceUri {
     Uri baseUri = await getBaseUri();
     return Uri.parse(_normalized(baseUri.toString() + append));
   }
+
+  static Future<void> setBaseUri(String uri) async {
+    if (uri.isEmpty) return;
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setString(Constants.databaseBaseUrl, _normalized(uri));
+  }
 }

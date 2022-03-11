@@ -10,7 +10,7 @@ class InputField extends StatefulWidget {
       {Key? key,
       required this.prefixIcon,
       required this.hintText,
-      required this.isPassword,
+      this.isPassword = false,
       required this.controller})
       : super(key: key);
 

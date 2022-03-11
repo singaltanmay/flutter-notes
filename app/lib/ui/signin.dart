@@ -17,12 +17,12 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   Future<void> onSignInPressed(Function callback) async {
-    String username = usernameController.text;
-    String password = passwordController.text;
+    String username = _usernameController.text;
+    String password = _passwordController.text;
 
     if (username.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -43,7 +43,8 @@ class _SignInState extends State<SignIn> {
     }
 
     var appendedUri = await ResourceUri.getAppendedUri('signin');
-    final response = await http.post(appendedUri, body: {"username": username, "password": password});
+    final response = await http
+        .post(appendedUri, body: {"username": username, "password": password});
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
@@ -78,13 +79,13 @@ class _SignInState extends State<SignIn> {
                         size: 30, color: Color(0xffA6B0BD)),
                     hintText: "Username",
                     isPassword: false,
-                    controller: usernameController),
+                    controller: _usernameController),
                 InputField(
                     prefixIcon: const Icon(Icons.lock_outline,
                         size: 30, color: Color(0xffA6B0BD)),
                     hintText: "Password",
                     isPassword: true,
-                    controller: passwordController),
+                    controller: _passwordController),
                 _signinBtn(context),
                 const Text("Don't have an account?"),
                 _signUp(context),

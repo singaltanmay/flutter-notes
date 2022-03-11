@@ -1,4 +1,3 @@
-import 'package:app/ui/all_notes.dart';
 import 'package:app/ui/signin.dart';
 import 'package:flutter/material.dart';
 
@@ -14,9 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Notes',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: const MyHomePage(),
     );
   }

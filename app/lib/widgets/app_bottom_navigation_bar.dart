@@ -1,4 +1,6 @@
 import 'package:app/model/constants.dart';
+import 'package:app/ui/all_notes.dart';
+import 'package:app/ui/settings.dart';
 import 'package:flutter/material.dart';
 
 class AppBottomNavigationBar extends StatefulWidget {
@@ -26,6 +28,22 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar> {
       currentIndex: _currentIndex,
       onTap: (value) {
         // Respond to item press.
+        if (_currentIndex != value) {
+          switch (value) {
+            case Constants.appBarHomePosition:
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const AllNotes()));
+              break;
+            case Constants.appBarSettingsPosition:
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => Settings()));
+              break;
+            default:
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const AllNotes()));
+              break;
+          }
+        }
         setState(() => _currentIndex = value);
       },
       items: const [
