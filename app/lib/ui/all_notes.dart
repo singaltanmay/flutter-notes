@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:app/model/constants.dart';
+import 'package:app/model/db_connected_state.dart';
 import 'package:app/model/note.dart';
 import 'package:app/model/resource_uri.dart';
 import 'package:app/ui/note_editor.dart';
@@ -11,6 +12,7 @@ import 'package:app/widgets/app_bottom_navigation_bar.dart';
 import 'package:app/widgets/note_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AllNotes extends StatefulWidget {
   const AllNotes({Key? key}) : super(key: key);
@@ -74,13 +76,25 @@ Future<bool> deleteAllNotes() async {
   }
 }
 
-class _AllNotesState extends State<AllNotes> {
+class _AllNotesState extends DbConnectedState<AllNotes> {
   List<Note> _notes = [];
   bool _loadNotes = true;
 
   void refreshNotesOnBuild() {
     setState(() {
       _loadNotes = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      String? userTokenKey = prefs.getString(Constants.userTokenKey);
+      if (userTokenKey == null || userTokenKey.isEmpty) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const SignIn()));
+      }
     });
   }
 

@@ -1,4 +1,4 @@
-import 'package:app/ui/signin.dart';
+import 'package:app/ui/all_notes.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,19 +11,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Notes',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: SignIn());
+        title: 'Flutter Notes',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(primarySwatch: Colors.blue),
+        home: const Scaffold(body: AllNotes()));
   }
 }
