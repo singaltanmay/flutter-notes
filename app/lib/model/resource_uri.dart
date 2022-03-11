@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants.dart';
@@ -35,5 +36,16 @@ class ResourceUri {
     if (uri.isEmpty) return;
     var prefs = await SharedPreferences.getInstance();
     prefs.setString(Constants.databaseBaseUrl, _normalized(uri));
+  }
+
+  static Future<bool> isServerHealthy() async {
+    var appendedUri = await getAppendedUri('health');
+    try {
+      var response = await http.get(appendedUri);
+      return response.statusCode == 200 &&
+          response.body.toLowerCase() == "true";
+    } catch(_) {
+      return false;
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:app/model/constants.dart';
+import 'package:app/model/db_connected_state.dart';
 import 'package:app/model/resource_uri.dart';
 import 'package:app/ui/all_notes.dart';
 import 'package:app/ui/signup.dart';
@@ -16,7 +17,7 @@ class SignIn extends StatefulWidget {
   State<SignIn> createState() => _SignInState();
 }
 
-class _SignInState extends State<SignIn> {
+class _SignInState extends DbConnectedState<SignIn> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 

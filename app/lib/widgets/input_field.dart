@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 class InputField extends StatefulWidget {
-  final Icon prefixIcon;
+  Icon? prefixIcon;
   final String hintText;
   final bool isPassword;
   final TextEditingController controller;
+  Widget? suffixIcon;
 
-  const InputField(
+  InputField(
       {Key? key,
-      required this.prefixIcon,
+      this.prefixIcon,
+      this.suffixIcon,
       required this.hintText,
       this.isPassword = false,
       required this.controller})
@@ -49,6 +51,10 @@ class _InputFieldState extends State<InputField> {
           filled: true,
           prefixIcon: widget.prefixIcon,
           prefixIconConstraints: const BoxConstraints(
+            minWidth: 75,
+          ),
+          suffixIcon: widget.suffixIcon,
+          suffixIconConstraints: const BoxConstraints(
             minWidth: 75,
           ),
           enabledBorder: const OutlineInputBorder(
