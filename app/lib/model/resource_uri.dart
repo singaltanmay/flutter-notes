@@ -16,13 +16,13 @@ class ResourceUri {
 
   static Future<Uri> getBaseUri() async {
     var prefs = await SharedPreferences.getInstance();
-    String? sharedPrefsBaseUrl = prefs.getString(Constants.DATABASE_BASE_URL);
+    String? sharedPrefsBaseUrl = prefs.getString(Constants.databaseBaseUrl);
     if (sharedPrefsBaseUrl != null && sharedPrefsBaseUrl.isNotEmpty) {
       return Uri.parse(_normalized(sharedPrefsBaseUrl));
     }
     const String envBaseUrl = String.fromEnvironment('DB_BASE_URL',
         defaultValue: 'http://localhost:3000/');
-    prefs.setString(Constants.DATABASE_BASE_URL, envBaseUrl);
+    prefs.setString(Constants.databaseBaseUrl, envBaseUrl);
     return Uri.parse(_normalized(envBaseUrl));
   }
 

@@ -1,5 +1,5 @@
 import 'package:app/model/constants.dart';
-import 'package:app/model/resourceUri.dart';
+import 'package:app/model/resource_uri.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -64,7 +64,7 @@ class _NoteEditorState extends State<NoteEditor> {
 
   Future<String> getCurrentUserToken() async {
     var prefs = await SharedPreferences.getInstance();
-    String? currentUser = prefs.getString(Constants.USER_TOKEN_KEY);
+    String? currentUser = prefs.getString(Constants.userTokenKey);
     if (currentUser == null) {
       throw Exception('User Token not found in Shared Preferences!');
     }

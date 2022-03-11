@@ -1,12 +1,12 @@
 import 'package:app/model/constants.dart';
-import 'package:app/model/resourceUri.dart';
-import 'package:app/widgets/inputField.dart';
+import 'package:app/model/resource_uri.dart';
+import 'package:app/widgets/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/logo.dart';
-import 'allNotes.dart';
+import 'all_notes.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -75,7 +75,7 @@ class _SignUpState extends State<SignUp> {
       // If the server did return a 200 OK response,
       // then parse the JSON.
       var prefs = await SharedPreferences.getInstance();
-      prefs.setString(Constants.USER_TOKEN_KEY, response.body);
+      prefs.setString(Constants.userTokenKey, response.body);
       callback();
     } else {
       // If the server did not return a 200 OK response,
@@ -104,7 +104,7 @@ class _SignUpState extends State<SignUp> {
         onPressed: () => onSignUpPressed(() => {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => AllNotes()),
+                MaterialPageRoute(builder: (context) => const AllNotes()),
               )
             }),
         textColor: Colors.white,
@@ -127,7 +127,7 @@ class _SignUpState extends State<SignUp> {
             width: double.infinity,
             child: Column(
               children: [
-                Logo(),
+                const Logo(),
                 Container(
                     margin: const EdgeInsets.all(50),
                     child: const Text("Flutter Notes")),

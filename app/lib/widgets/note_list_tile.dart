@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:app/model/note.dart';
-import 'package:app/model/resourceUri.dart';
-import 'package:app/ui/noteEditor.dart';
+import 'package:app/model/resource_uri.dart';
+import 'package:app/ui/note_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -30,11 +30,10 @@ class NoteListTile extends StatefulWidget {
   Future<bool> delete() async {
     try {
       var appendedUri = await ResourceUri.getAppendedUri(note.id!);
-      final response = await http.delete(appendedUri,
-          headers: {
-            "Accept": "application/json",
-            "Access-Control-Allow-Origin": "*"
-          });
+      final response = await http.delete(appendedUri, headers: {
+        "Accept": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      });
 
       if (response.statusCode == 200) {
         // If the server did return a 200 OK response,
@@ -55,8 +54,7 @@ class NoteListTile extends StatefulWidget {
 class _NoteListTileState extends State<NoteListTile> {
   Future<String?> getNoteCreatorUsername(String creatorId) async {
     var appendedUri = await ResourceUri.getAppendedUri("user/" + creatorId);
-    final response =
-        await http.get(appendedUri);
+    final response = await http.get(appendedUri);
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.

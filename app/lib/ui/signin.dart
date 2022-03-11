@@ -1,8 +1,8 @@
 import 'package:app/model/constants.dart';
-import 'package:app/model/resourceUri.dart';
-import 'package:app/ui/allNotes.dart';
+import 'package:app/model/resource_uri.dart';
+import 'package:app/ui/all_notes.dart';
 import 'package:app/ui/signup.dart';
-import 'package:app/widgets/inputField.dart';
+import 'package:app/widgets/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,7 +48,7 @@ class _SignInState extends State<SignIn> {
       // If the server did return a 200 OK response,
       // then parse the JSON.
       var prefs = await SharedPreferences.getInstance();
-      prefs.setString(Constants.USER_TOKEN_KEY, response.body);
+      prefs.setString(Constants.userTokenKey, response.body);
       callback();
     } else {
       // If the server did not return a 200 OK response,
@@ -71,7 +71,7 @@ class _SignInState extends State<SignIn> {
             width: double.infinity,
             child: Column(
               children: [
-                Logo(),
+                const Logo(),
                 _logoText(),
                 InputField(
                     prefixIcon: const Icon(Icons.person_outline,
@@ -115,7 +115,7 @@ class _SignInState extends State<SignIn> {
         onPressed: () => onSignInPressed(() => {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => AllNotes()),
+                MaterialPageRoute(builder: (context) => const AllNotes()),
               )
             }),
         textColor: Colors.white,
@@ -131,7 +131,7 @@ Widget _signUp(BuildContext context) {
     onPressed: () => {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => SignUp()),
+        MaterialPageRoute(builder: (context) => const SignUp()),
       )
     },
     child: const Text("SIGN UP NOW"),

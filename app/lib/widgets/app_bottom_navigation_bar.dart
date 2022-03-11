@@ -1,13 +1,11 @@
+import 'package:app/model/constants.dart';
 import 'package:flutter/material.dart';
 
 class AppBottomNavigationBar extends StatefulWidget {
   final int initialPosition;
-  static const int HOME_POSITION = 0;
-  static const int SEARCH_POSITION = 1;
-  static const int STARRED_POSITION = 2;
-  static const int SETTINGS_POSITION = 3;
 
-  const AppBottomNavigationBar({Key? key, this.initialPosition = HOME_POSITION})
+  const AppBottomNavigationBar(
+      {Key? key, this.initialPosition = Constants.appBarHomePosition})
       : super(key: key);
 
   @override

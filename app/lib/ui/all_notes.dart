@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:app/model/constants.dart';
 import 'package:app/model/note.dart';
-import 'package:app/model/resourceUri.dart';
-import 'package:app/ui/noteEditor.dart';
+import 'package:app/model/resource_uri.dart';
+import 'package:app/ui/note_editor.dart';
 import 'package:app/ui/signin.dart';
-import 'package:app/widgets/appBottomNavigationBar.dart';
-import 'package:app/widgets/noteListTile.dart';
+import 'package:app/widgets/app_bottom_navigation_bar.dart';
+import 'package:app/widgets/note_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -135,7 +136,7 @@ class _AllNotesState extends State<AllNotes> {
                   if (value == 1) {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => SignIn()),
+                      MaterialPageRoute(builder: (context) => const SignIn()),
                     );
                   }
                 }),
@@ -200,7 +201,7 @@ class _AllNotesState extends State<AllNotes> {
         ),
       ),
       bottomNavigationBar: const AppBottomNavigationBar(
-        initialPosition: AppBottomNavigationBar.HOME_POSITION,
+        initialPosition: Constants.appBarHomePosition,
       ),
     );
   }
