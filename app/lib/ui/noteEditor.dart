@@ -26,8 +26,8 @@ class _NoteEditorState extends State<NoteEditor> {
         body: bodyController.text,
         creator: currentUser);
 
-    final response =
-        await http.post(ResourceUri.getBaseUri(), body: note.toMap());
+    var baseUri = await ResourceUri.getBaseUri();
+    final response = await http.post(baseUri, body: note.toMap());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
@@ -48,8 +48,8 @@ class _NoteEditorState extends State<NoteEditor> {
         body: bodyController.text,
         creator: currentUser);
 
-    final response =
-        await http.put(ResourceUri.getBaseUri(), body: note.toMap());
+    var baseUri = await ResourceUri.getBaseUri();
+    final response = await http.put(baseUri, body: note.toMap());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.

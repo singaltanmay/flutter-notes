@@ -29,7 +29,8 @@ class NoteListTile extends StatefulWidget {
 
   Future<bool> delete() async {
     try {
-      final response = await http.delete(ResourceUri.getAppendedUri(note.id!),
+      var appendedUri = await ResourceUri.getAppendedUri(note.id!);
+      final response = await http.delete(appendedUri,
           headers: {
             "Accept": "application/json",
             "Access-Control-Allow-Origin": "*"
@@ -53,8 +54,9 @@ class NoteListTile extends StatefulWidget {
 
 class _NoteListTileState extends State<NoteListTile> {
   Future<String?> getNoteCreatorUsername(String creatorId) async {
+    var appendedUri = await ResourceUri.getAppendedUri("user/" + creatorId);
     final response =
-        await http.get(ResourceUri.getAppendedUri("user/" + creatorId));
+        await http.get(appendedUri);
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.

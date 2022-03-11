@@ -42,8 +42,8 @@ class _SignInState extends State<SignIn> {
       return;
     }
 
-    final response = await http.post(ResourceUri.getAppendedUri('signin'),
-        body: {"username": username, "password": password});
+    var appendedUri = await ResourceUri.getAppendedUri('signin');
+    final response = await http.post(appendedUri, body: {"username": username, "password": password});
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.

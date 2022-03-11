@@ -64,7 +64,8 @@ class _SignUpState extends State<SignUp> {
       return;
     }
 
-    final response = await http.post(ResourceUri.getAppendedUri('user'), body: {
+    var appendedUri = await ResourceUri.getAppendedUri('user');
+    final response = await http.post(appendedUri, body: {
       "username": username,
       "password": password,
       "securityQuestion": securityQuestion,
