@@ -92,8 +92,7 @@ class _AllNotesState extends DbConnectedState<AllNotes> {
     SharedPreferences.getInstance().then((prefs) {
       String? userTokenKey = prefs.getString(Constants.userTokenKey);
       if (userTokenKey == null || userTokenKey.isEmpty) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const SignIn()));
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SignIn()));
       }
     });
   }

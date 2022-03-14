@@ -2,11 +2,13 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const jwt = require('jsonwebtoken')
 
 const mongoose = require('mongoose');
 
 const server = '127.0.0.1:27017';
 const database = 'flutter-notes-db';
+const TOKEN_SECRET = 'QKKawsbKW1OgC5FIvcEtjjsnLTkVbFRi7ITxnjId'
 
 let mongooseConnected = false;
 let mongoUrl = `mongodb://${server}/${database}`;
@@ -65,8 +67,10 @@ app.use(function (err, req, res, next) {
     res.send(JSON.stringify(err));
 });
 
+// Schema imports
 const Note = require('./schema/Note')
 const User = require('./schema/User')
+const Token = require('./schema/Token')
 
 function getAllNotes(req, res, next) {
     Note.find().then(notes => {
@@ -150,7 +154,10 @@ async function signInUser(req, res, next) {
     await User.findOne({
         'username': req.body.username, 'password': req.body.password
     }).then(user => {
-        res.status(200).send(user._id.toString());
+
+        // Create JWT
+        const jwToken = jwt.sign({"username": user._id.toString()}, TOKEN_SECRET, {expiresIn: '1800s'})
+        res.status(200).send(jwToken);
     }).catch(err => {
         console.log(err)
         next(err)
