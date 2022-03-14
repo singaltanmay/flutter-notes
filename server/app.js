@@ -45,8 +45,7 @@ app.post('/', saveNote)
 app.delete('/', deleteAllNotes)
 app.delete('/:noteId', deleteNote)
 app.put('/', updateNote)
-app.get('/user', getAllUsers)
-app.get('/user/:userId', getUserById)
+app.get('/user', getUserByToken)
 app.post('/user', signUpUser)
 app.post('/signin', signInUser)
 app.get('/health', (_, res) => res.send(mongooseConnected))
@@ -130,18 +129,10 @@ function deleteNote(req, res, next) {
     Note.deleteOne({'_id': req.params.noteId}).then(res.sendStatus(200)).catch(next)
 }
 
-function getAllUsers(req, res, next) {
-    User.find().then(users => {
-        let redactedUsers = []
-        users.forEach(user => redactedUsers.push(user.redactedJson()));
-        res.send(redactedUsers)
-    }).catch(err => {
-        next(err)
-    });
-}
-
-function getUserById(req, res, next) {
-    User.findById(req.params.userId).then(user => {
+async function getUserByToken(req, res, next) {
+    const token = req.query.token
+    let userId = await getUserIdByToken(token);
+    User.findById(userId).then(user => {
         res.status(200).send(user.redactedJson());
     }).catch(err => {
         console.log(err)
@@ -154,10 +145,18 @@ async function signInUser(req, res, next) {
     await User.findOne({
         'username': req.body.username, 'password': req.body.password
     }).then(user => {
-
         // Create JWT
-        const jwToken = jwt.sign({"username": user._id.toString()}, TOKEN_SECRET, {expiresIn: '1800s'})
-        res.status(200).send(jwToken);
+        let userId = user._id.toString();
+        const jwToken = jwt.sign({"username": userId}, TOKEN_SECRET, {expiresIn: '1800s'})
+        const token = new Token({
+            user: userId, token: jwToken
+        });
+        token.save().then(_ => {
+            res.status(200).send(jwToken);
+        }).catch(err => {
+            console.log(err)
+            next(err)
+        });
     }).catch(err => {
         console.log(err)
         next(err)
@@ -173,11 +172,19 @@ function signUpUser(req, res, next) {
     });
     user.save()
         .then(_ => {
-            res.status(200).send(user._id.toString());
+            return (signInUser(req, res, next))
         }).catch(err => {
         console.log(err)
         next(err)
     });
+}
+
+async function getUserIdByToken(token) {
+    if (!token) return null;
+    const tokenObj = await Token.findOne({token: token});
+    if (tokenObj && tokenObj.user) {
+        return tokenObj.user.toString()
+    } else return null;
 }
 
 module.exports = app;
