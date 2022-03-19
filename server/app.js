@@ -40,13 +40,12 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // HTTP method declarations
-app.get('/', getAllNotes)
-app.post('/', saveNote)
-app.delete('/', deleteAllNotes)
-app.delete('/:noteId', deleteNote)
-app.put('/', updateNote)
-app.get('/user', getUserByToken)
-app.post('/user', signUpUser)
+app.get('/note', getNote)
+app.post('/note', saveNote)
+app.delete('/note', deleteNote)
+app.put('/note', updateNote)
+app.get('/user', getUser)
+app.post('/signup', signUpUser)
 app.post('/signin', signInUser)
 app.get('/health', (_, res) => res.send(mongooseConnected))
 
@@ -71,13 +70,24 @@ const Note = require('./schema/Note')
 const User = require('./schema/User')
 const Token = require('./schema/Token')
 
-function getAllNotes(req, res, next) {
-    Note.find().then(notes => {
-        res.send(notes)
-    }).catch(err => {
-        console.log(err)
-        next(err)
-    });
+async function getNote({query}, res, next) {
+    // Return all notes if note id is not provided
+    if (!query || !(query.noteid)) {
+        Note.find().then(notes => {
+            res.send(notes)
+        }).catch(err => {
+            console.log(err)
+            next(err)
+        });
+    } else {
+        Note.findById(query.noteid).then(note => {
+            res.status(200).send(note);
+        }).catch(err => {
+            console.log(err)
+            res.sendStatus(404)
+            next(err)
+        })
+    }
 }
 
 async function saveNote({query, body}, res, next) {
@@ -122,15 +132,20 @@ async function updateNote({query, body}, res, next) {
     })
 }
 
-function deleteAllNotes(req, res, next) {
-    Note.deleteMany().then(res.sendStatus(200)).catch(next)
+function deleteNote({query}, res, next) {
+    // Delete all notes if note id is not provided
+    if (!query || !(query.noteid)) {
+        Note.deleteMany().then(res.sendStatus(200)).catch(err => {
+            console.log(err)
+            res.sendStatus(500)
+            next(err)
+        })
+    } else {
+        Note.deleteOne({'_id': query.noteid}).then(res.sendStatus(200)).catch(next)
+    }
 }
 
-function deleteNote(req, res, next) {
-    Note.deleteOne({'_id': req.params.noteId}).then(res.sendStatus(200)).catch(next)
-}
-
-async function getUserByToken(req, res, next) {
+async function getUser(req, res, next) {
     const token = req.query.token
     let userId = await getUserIdByToken(token);
     User.findById(userId).then(user => {
