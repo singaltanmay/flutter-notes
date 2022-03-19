@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 // Custom State class that checks for database connectivity on creation.
 // If database cannot be reached then a NoConnectionModal() is displayed
 abstract class DbConnectedState<T extends StatefulWidget> extends State<T> {
+
+
   @override
   void initState() {
     super.initState();
