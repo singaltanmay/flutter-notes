@@ -7,7 +7,7 @@ import 'constants.dart';
 class UrlBuilder {
 
   var currentQueryChar = "?";
-  Map<String, dynamic> currentQuery = {};
+  var currentQuery = "";
   var currentAppend = "";
 
 
@@ -17,21 +17,20 @@ class UrlBuilder {
   }
 
   UrlBuilder query(String query, String value) {
-    currentQuery[query] = value;
+    if(currentQuery.isNotEmpty){
+      currentQueryChar="&";
+    }
+    currentQuery = currentQueryChar + query + "=" + value;
     return this;
   }
 
   Future<Uri> build({bool withToken = true}) async {
     if (withToken) {
       var prefs = await SharedPreferences.getInstance();
-      currentQuery["token"] = prefs.getString(Constants.userTokenKey)!;
+      query("token", prefs.getString(Constants.userTokenKey)!);
     }
-
-    return Uri(
-        scheme: 'http',
-        host: await ResourceUri.getBase(),
-        path: currentAppend,
-        queryParameters: currentQuery);
+    var baseUrl = await ResourceUri.getBase();
+    return Uri.parse(baseUrl + currentAppend + currentQuery);
   }
 
 }

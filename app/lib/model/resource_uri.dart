@@ -35,7 +35,7 @@ class ResourceUri {
   static Future<void> setBaseUri(String uri) async {
     if (uri.isEmpty) return;
     var prefs = await SharedPreferences.getInstance();
-    prefs.setString(Constants.databaseBaseUrl, cleanBaseUrl(uri));
+    prefs.setString(Constants.databaseBaseUrl, _normalized(uri));
   }
 
   static Future<bool> isServerHealthy() async {
@@ -53,19 +53,12 @@ class ResourceUri {
     var prefs = await SharedPreferences.getInstance();
     String? sharedPrefsBaseUrl = prefs.getString(Constants.databaseBaseUrl);
     if (sharedPrefsBaseUrl != null && sharedPrefsBaseUrl.isNotEmpty) {
-      return cleanBaseUrl(sharedPrefsBaseUrl);
+      return _normalized(sharedPrefsBaseUrl);
     }
     String envBaseUrl = const String.fromEnvironment('DB_BASE_URL',
         defaultValue: 'localhost:3000/');
-    envBaseUrl = cleanBaseUrl(envBaseUrl);
+    envBaseUrl = _normalized(envBaseUrl);
     prefs.setString(Constants.databaseBaseUrl, envBaseUrl);
-    return envBaseUrl;
-  }
-
-  static String cleanBaseUrl(String envBaseUrl) {
-    if(envBaseUrl.startsWith("https://")) envBaseUrl =envBaseUrl.replaceAll("https://", "");
-    if(envBaseUrl.startsWith("http://")) envBaseUrl =envBaseUrl.replaceAll("http://", "");
-    if(envBaseUrl.endsWith("/")) envBaseUrl = envBaseUrl.substring(0,envBaseUrl.length-1);
     return envBaseUrl;
   }
 }
