@@ -40,13 +40,12 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // HTTP method declarations
-app.get('/', getAllNotes)
-app.post('/', saveNote)
-app.delete('/', deleteAllNotes)
-app.delete('/:noteId', deleteNote)
-app.put('/', updateNote)
-app.get('/user', getUserByToken)
-app.post('/user', signUpUser)
+app.get('/note', getNote)
+app.post('/note', saveNote)
+app.delete('/note', deleteNote)
+app.put('/note', updateNote)
+app.get('/user', getUser)
+app.post('/signup', signUpUser)
 app.post('/signin', signInUser)
 app.get('/health', (_, res) => res.send(mongooseConnected))
 
@@ -69,22 +68,32 @@ app.use(function (err, req, res, next) {
 // Schema imports
 const Note = require('./schema/Note')
 const User = require('./schema/User')
-const Token = require('./schema/Token')
 
-function getAllNotes(req, res, next) {
-    Note.find().then(notes => {
-        res.send(notes)
-    }).catch(err => {
-        console.log(err)
-        next(err)
-    });
+async function getNote({query}, res, next) {
+    // Return all notes if note id is not provided
+    if (!query || !(query.noteid)) {
+        Note.find().then(notes => {
+            res.send(notes)
+        }).catch(err => {
+            console.log(err)
+            next(err)
+        });
+    } else {
+        Note.findById(query.noteid).then(note => {
+            res.status(200).send(note);
+        }).catch(err => {
+            console.log(err)
+            res.sendStatus(404)
+            next(err)
+        })
+    }
 }
 
-async function saveNote({body}, res, next) {
+async function saveNote({query, body}, res, next) {
+    let creator = await getUserIdByToken(query.token);
     const note = new Note({
         title: body.title, body: body.body, created: body.created, starred: body.starred
     })
-    const creator = await User.findById(body.creator)
     if (creator == null) {
         let errorMsg = "Cannot save note without a valid creator";
         console.log(errorMsg + "\n" + note)
@@ -101,17 +110,18 @@ async function saveNote({body}, res, next) {
     });
 }
 
-async function updateNote({body}, res, next) {
+async function updateNote({query, body}, res, next) {
     const oldNote = await Note.findById(body._id);
     if (oldNote == null) {
         res.sendStatus(404)
         return;
     }
+    let userId = await getUserIdByToken(query.token);
     Note.updateOne({'_id': body._id}, {
         'title': body.title || oldNote['title'],
         'body': body.body || oldNote['body'],
         'created': body.created || oldNote['created'],
-        'creator': body.creator || oldNote['creator'],
+        'creator': userId || oldNote['creator'],
         'starred': body.starred || oldNote['starred']
     }).then(_ => {
         res.sendStatus(200);
@@ -121,15 +131,20 @@ async function updateNote({body}, res, next) {
     })
 }
 
-function deleteAllNotes(req, res, next) {
-    Note.deleteMany().then(res.sendStatus(200)).catch(next)
+function deleteNote({query}, res, next) {
+    // Delete all notes if note id is not provided
+    if (!query || !(query.noteid)) {
+        Note.deleteMany().then(res.sendStatus(200)).catch(err => {
+            console.log(err)
+            res.sendStatus(500)
+            next(err)
+        })
+    } else {
+        Note.deleteOne({'_id': query.noteid}).then(res.sendStatus(200)).catch(next)
+    }
 }
 
-function deleteNote(req, res, next) {
-    Note.deleteOne({'_id': req.params.noteId}).then(res.sendStatus(200)).catch(next)
-}
-
-async function getUserByToken(req, res, next) {
+async function getUser(req, res, next) {
     const token = req.query.token
     let userId = await getUserIdByToken(token);
     User.findById(userId).then(user => {
@@ -148,15 +163,7 @@ async function signInUser(req, res, next) {
         // Create JWT
         let userId = user._id.toString();
         const jwToken = jwt.sign({"username": userId}, TOKEN_SECRET, {expiresIn: '1800s'})
-        const token = new Token({
-            user: userId, token: jwToken
-        });
-        token.save().then(_ => {
-            res.status(200).send(jwToken);
-        }).catch(err => {
-            console.log(err)
-            next(err)
-        });
+        res.status(200).send(jwToken);
     }).catch(err => {
         console.log(err)
         next(err)
@@ -181,9 +188,14 @@ function signUpUser(req, res, next) {
 
 async function getUserIdByToken(token) {
     if (!token) return null;
-    const tokenObj = await Token.findOne({token: token});
-    if (tokenObj && tokenObj.user) {
-        return tokenObj.user.toString()
+    const tokenObj = jwt.decode(token);
+    if (tokenObj && tokenObj['username']) {
+        // Check if the user who the token was issued to still exists
+        let tokenUserId = tokenObj['username'].toString();
+        const userFromDb = await User.findById(tokenUserId)
+        if (userFromDb && userFromDb._id.toString() === tokenUserId) {
+            return tokenUserId
+        } else return null;
     } else return null;
 }
 
