@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/note.dart';
+import '../model/url_builder.dart';
 
 class NoteEditor extends StatefulWidget {
   final Note? note;
@@ -26,7 +27,7 @@ class _NoteEditorState extends State<NoteEditor> {
         body: bodyController.text,
         creator: currentUser);
 
-    var baseUri = await ResourceUri.getBaseUri();
+    var baseUri = await UrlBuilder().append("note").build();
     final response = await http.post(baseUri, body: note.toMap());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
@@ -48,7 +49,7 @@ class _NoteEditorState extends State<NoteEditor> {
         body: bodyController.text,
         creator: currentUser);
 
-    var baseUri = await ResourceUri.getBaseUri();
+    var baseUri = await UrlBuilder().append("note").build();
     final response = await http.put(baseUri, body: note.toMap());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,

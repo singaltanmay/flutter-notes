@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../model/url_builder.dart';
+
 class AllNotes extends StatefulWidget {
   const AllNotes({Key? key}) : super(key: key);
 
@@ -27,7 +29,7 @@ void printServerCommFailedError() {
 
 Future<List<Note>> fetchNotes() async {
   try {
-    var baseUri = await ResourceUri.getBaseUri();
+    var baseUri = await UrlBuilder().append("note").build();
     final response = await http.get(baseUri, headers: {
       "Accept": "application/json",
       "Access-Control-Allow-Origin": "*"
@@ -92,7 +94,7 @@ class _AllNotesState extends DbConnectedState<AllNotes> {
     SharedPreferences.getInstance().then((prefs) {
       String? userTokenKey = prefs.getString(Constants.userTokenKey);
       if (userTokenKey == null || userTokenKey.isEmpty) {
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SignIn()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SignIn()));
       }
     });
   }
@@ -147,10 +149,13 @@ class _AllNotesState extends DbConnectedState<AllNotes> {
                         });
                   }
                   if (value == 1) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const SignIn()),
-                    );
+                    SharedPreferences.getInstance().then((prefs) {
+                      prefs.remove(Constants.userTokenKey);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SignIn()),
+                      );
+                    });
                   }
                 }),
           )

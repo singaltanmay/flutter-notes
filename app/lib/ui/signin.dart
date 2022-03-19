@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../model/url_builder.dart';
 import '../widgets/logo.dart';
 
 class SignIn extends StatefulWidget {
@@ -43,7 +44,7 @@ class _SignInState extends DbConnectedState<SignIn> {
       return;
     }
 
-    var appendedUri = await ResourceUri.getAppendedUri('signin');
+    var appendedUri = await UrlBuilder().append("signin").build(withToken: false);
     final response = await http
         .post(appendedUri, body: {"username": username, "password": password});
     if (response.statusCode == 200) {
