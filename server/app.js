@@ -41,6 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // HTTP method declarations
 app.get('/note', getNote)
+app.get('/note/starred', getStarredNotes)
 app.post('/note', saveNote)
 app.delete('/note', deleteNote)
 app.put('/note', updateNote)
@@ -89,6 +90,17 @@ async function getNote({query}, res, next) {
     }
 }
 
+async function getStarredNotes(req, res, next) {
+    // Return all notes if note id is not provided
+    Note.find({"starred": true}).then(notes => {
+        res.send(notes);
+    }).catch(err => {
+        console.log(err)
+        res.sendStatus(404)
+        next(err)
+    })
+}
+
 async function saveNote({query, body}, res, next) {
     let creator = await getUserIdByToken(query.token);
     const note = new Note({
@@ -111,13 +123,18 @@ async function saveNote({query, body}, res, next) {
 }
 
 async function updateNote({query, body}, res, next) {
-    const oldNote = await Note.findById(body._id);
+    const noteId = body._id || query.noteid;
+    if (!noteId) {
+        res.sendStatus(404)
+        return;
+    }
+    const oldNote = await Note.findById(noteId);
     if (oldNote == null) {
         res.sendStatus(404)
         return;
     }
     let userId = await getUserIdByToken(query.token);
-    Note.updateOne({'_id': body._id}, {
+    Note.updateOne({'_id': noteId}, {
         'title': body.title || oldNote['title'],
         'body': body.body || oldNote['body'],
         'created': body.created || oldNote['created'],
@@ -144,9 +161,8 @@ function deleteNote({query}, res, next) {
     }
 }
 
-async function getUser(req, res, next) {
-    const token = req.query.token
-    let userId = await getUserIdByToken(token);
+async function getUser({query}, res, next) {
+    let userId = await getUserIdByToken(query.token);
     User.findById(userId).then(user => {
         res.status(200).send(user.redactedJson());
     }).catch(err => {
