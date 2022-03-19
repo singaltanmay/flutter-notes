@@ -1,6 +1,8 @@
 class Constants {
   // Shared Preferences Keys
   static const String userTokenKey = 'user_token';
+  static const String userName = 'user_name';
+  static const String password = 'password';
   static const String databaseBaseUrl = 'database_base_url';
 
   // Bottom App Bar Position Keys

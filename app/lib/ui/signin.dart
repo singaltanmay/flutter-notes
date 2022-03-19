@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/url_builder.dart';
 import '../widgets/logo.dart';
+import '../widgets/no_connection_modal.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -21,6 +22,7 @@ class SignIn extends StatefulWidget {
 class _SignInState extends DbConnectedState<SignIn> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool checkedValue = true;
 
   Future<void> onSignInPressed(Function callback) async {
     String username = _usernameController.text;
@@ -52,17 +54,38 @@ class _SignInState extends DbConnectedState<SignIn> {
       // then parse the JSON.
       var prefs = await SharedPreferences.getInstance();
       prefs.setString(Constants.userTokenKey, response.body);
+      if (checkedValue) {
+        prefs.setString(Constants.userName, username);
+        prefs.setString(Constants.password, password);
+      }
       callback();
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
-      throw Exception(
-          'Failed to Sign In. Response code = ${response.statusCode}\n');
+      ResourceUri.isServerHealthy().then((value) => {
+        if (!value)
+          {
+            showBottomSheet(
+              builder: (context) {
+                return NoConnectionModal(
+                  callback: () {
+                    // Close this modal sheet
+                    Navigator.of(context).pop();
+                  },
+                );
+              },
+              context: context,
+            )
+          }
+      });
+      /*throw Exception(
+          'Failed to Sign In. Response code = ${response.statusCode}\n');*/
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    getPrefilledUserName();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Sign In",
@@ -88,6 +111,18 @@ class _SignInState extends DbConnectedState<SignIn> {
                     hintText: "Password",
                     isPassword: true,
                     controller: _passwordController),
+                CheckboxListTile(
+                    title: const Text("Remember Me",
+                        style: TextStyle(
+                          fontSize: 14.0
+                        )),
+                  value: checkedValue,
+                  onChanged: (newValue) {
+                    setState(() {
+                      checkedValue = newValue ?? true;
+                      });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading),
                 _signinBtn(context),
                 const Text("Don't have an account?"),
                 _signUp(context),
@@ -126,6 +161,12 @@ class _SignInState extends DbConnectedState<SignIn> {
         child: const Text("SIGN IN"),
       ),
     );
+  }
+
+  getPrefilledUserName() async {
+    var prefs = await SharedPreferences.getInstance();
+    _usernameController.text = prefs.getString(Constants.userName) ?? "";
+    _passwordController.text = prefs.getString(Constants.password) ?? "";
   }
 }
 

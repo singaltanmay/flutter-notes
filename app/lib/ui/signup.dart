@@ -22,6 +22,7 @@ class _SignUpState extends State<SignUp> {
   TextEditingController securityQuestionController = TextEditingController();
   TextEditingController securityQuestionAnswerController =
       TextEditingController();
+  bool checkedValue = true;
 
   Future<void> onSignUpPressed(Function callback) async {
     String username = usernameController.text;
@@ -77,6 +78,12 @@ class _SignUpState extends State<SignUp> {
       // then parse the JSON.
       var prefs = await SharedPreferences.getInstance();
       prefs.setString(Constants.userTokenKey, response.body);
+
+      if (checkedValue) {
+        prefs.setString(Constants.userName, username);
+        prefs.setString(Constants.password, password);
+      }
+
       callback();
     } else {
       // If the server did not return a 200 OK response,
@@ -156,6 +163,18 @@ class _SignUpState extends State<SignUp> {
                     hintText: "Security Question Answer",
                     isPassword: false,
                     controller: securityQuestionAnswerController),
+                CheckboxListTile(
+                    title: const Text("Remember Me",
+                        style: TextStyle(
+                            fontSize: 14.0
+                        )),
+                    value: checkedValue,
+                    onChanged: (newValue) {
+                      setState(() {
+                        checkedValue = newValue ?? true;
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading),
                 _signupBtn(),
               ],
             ),
