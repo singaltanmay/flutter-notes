@@ -81,11 +81,10 @@ function getAllNotes(req, res, next) {
 }
 
 async function saveNote({query, body}, res, next) {
-    let userId = await getUserIdByToken(query.token);
+    let creator = await getUserIdByToken(query.token);
     const note = new Note({
         title: body.title, body: body.body, created: body.created, starred: body.starred
     })
-    const creator = await User.findById(userId)
     if (creator == null) {
         let errorMsg = "Cannot save note without a valid creator";
         console.log(errorMsg + "\n" + note)
@@ -102,17 +101,18 @@ async function saveNote({query, body}, res, next) {
     });
 }
 
-async function updateNote({body}, res, next) {
+async function updateNote({query, body}, res, next) {
     const oldNote = await Note.findById(body._id);
     if (oldNote == null) {
         res.sendStatus(404)
         return;
     }
+    let userId = await getUserIdByToken(query.token);
     Note.updateOne({'_id': body._id}, {
         'title': body.title || oldNote['title'],
         'body': body.body || oldNote['body'],
         'created': body.created || oldNote['created'],
-        'creator': body.creator || oldNote['creator'],
+        'creator': userId || oldNote['creator'],
         'starred': body.starred || oldNote['starred']
     }).then(_ => {
         res.sendStatus(200);
@@ -184,7 +184,12 @@ async function getUserIdByToken(token) {
     if (!token) return null;
     const tokenObj = await Token.findOne({token: token});
     if (tokenObj && tokenObj.user) {
-        return tokenObj.user.toString()
+        // Check if the user who the token was issued to still exists
+        let tokenUserId = tokenObj.user.toString();
+        const userFromDb = await User.findById(tokenUserId)
+        if (userFromDb && userFromDb._id.toString() === tokenUserId) {
+            return tokenUserId
+        } else return null;
     } else return null;
 }
 
