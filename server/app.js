@@ -80,11 +80,12 @@ function getAllNotes(req, res, next) {
     });
 }
 
-async function saveNote({body}, res, next) {
+async function saveNote({query, body}, res, next) {
+    let userId = await getUserIdByToken(query.token);
     const note = new Note({
         title: body.title, body: body.body, created: body.created, starred: body.starred
     })
-    const creator = await User.findById(body.creator)
+    const creator = await User.findById(userId)
     if (creator == null) {
         let errorMsg = "Cannot save note without a valid creator";
         console.log(errorMsg + "\n" + note)
