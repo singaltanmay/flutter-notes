@@ -68,7 +68,6 @@ app.use(function (err, req, res, next) {
 // Schema imports
 const Note = require('./schema/Note')
 const User = require('./schema/User')
-const Token = require('./schema/Token')
 
 async function getNote({query}, res, next) {
     // Return all notes if note id is not provided
@@ -164,15 +163,7 @@ async function signInUser(req, res, next) {
         // Create JWT
         let userId = user._id.toString();
         const jwToken = jwt.sign({"username": userId}, TOKEN_SECRET, {expiresIn: '1800s'})
-        const token = new Token({
-            user: userId, token: jwToken
-        });
-        token.save().then(_ => {
-            res.status(200).send(jwToken);
-        }).catch(err => {
-            console.log(err)
-            next(err)
-        });
+        res.status(200).send(jwToken);
     }).catch(err => {
         console.log(err)
         next(err)
@@ -197,10 +188,10 @@ function signUpUser(req, res, next) {
 
 async function getUserIdByToken(token) {
     if (!token) return null;
-    const tokenObj = await Token.findOne({token: token});
-    if (tokenObj && tokenObj.user) {
+    const tokenObj = jwt.decode(token);
+    if (tokenObj && tokenObj['username']) {
         // Check if the user who the token was issued to still exists
-        let tokenUserId = tokenObj.user.toString();
+        let tokenUserId = tokenObj['username'].toString();
         const userFromDb = await User.findById(tokenUserId)
         if (userFromDb && userFromDb._id.toString() === tokenUserId) {
             return tokenUserId
