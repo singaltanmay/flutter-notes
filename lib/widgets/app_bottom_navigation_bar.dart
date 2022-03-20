@@ -40,7 +40,7 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar> {
               Navigator.pushReplacement(context,
                   PageRouteBuilder(
                       pageBuilder: (_, __, ___) =>
-                      const AllNotes(starredFragment: true)));
+                      Settings()));
               break;
             default:
               Navigator.pushReplacement(context,
