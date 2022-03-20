@@ -79,8 +79,8 @@ class _SignInState extends DbConnectedState<SignIn> {
                 )
               }
           });
-      /*throw Exception(
-          'Failed to Sign In. Response code = ${response.statusCode}\n');*/
+      throw Exception(
+          'Failed to Sign In. Response code = ${response.statusCode}\n');
     }
   }
 
@@ -152,7 +152,7 @@ class _SignInState extends DbConnectedState<SignIn> {
         onPressed: () => onSignInPressed(() => {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const AllNotes()),
+                MaterialPageRoute(builder: (context) => const AllNotes(starredFragment: false)),
               )
             }),
         textColor: Colors.white,

@@ -112,7 +112,7 @@ class _SignUpState extends State<SignUp> {
         onPressed: () => onSignUpPressed(() => {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const AllNotes()),
+                MaterialPageRoute(builder: (context) => const AllNotes(starredFragment: false)),
               )
             }),
         textColor: Colors.white,

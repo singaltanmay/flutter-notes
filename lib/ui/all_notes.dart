@@ -17,7 +17,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../model/url_builder.dart';
 
 class AllNotes extends StatefulWidget {
-  const AllNotes({Key? key}) : super(key: key);
+  final bool starredFragment;
+
+  const AllNotes({Key? key,required this.starredFragment}) : super(key: key);
 
   @override
   _AllNotesState createState() => _AllNotesState();
@@ -27,9 +29,14 @@ void printServerCommFailedError() {
   stderr.writeln('Failed to communicate with server');
 }
 
-Future<List<Note>> fetchNotes() async {
+Future<List<Note>> fetchNotes(bool starredFragment) async {
   try {
-    var baseUri = await UrlBuilder().append("note").build();
+    Uri baseUri;
+    if(starredFragment){
+      baseUri = await UrlBuilder().append("note/starred").build();
+    }else{
+      baseUri = await UrlBuilder().append("note").build();
+    }
     final response = await http.get(baseUri, headers: {
       "Accept": "application/json",
       "Access-Control-Allow-Origin": "*"
@@ -103,10 +110,14 @@ class _AllNotesState extends DbConnectedState<AllNotes> {
   @override
   Widget build(BuildContext context) {
     if (_loadNotes) {
-      fetchNotes().then((value) => setState(() {
+      fetchNotes(widget.starredFragment).then((value) => {
+        if (mounted){
+          setState(() {
             _loadNotes = false;
             _notes = value;
-          }));
+          })
+        }
+      });
     }
 
     List<Widget> noteWidgetsList = [];
@@ -219,8 +230,8 @@ class _AllNotesState extends DbConnectedState<AllNotes> {
           },
         ),
       ),
-      bottomNavigationBar: const AppBottomNavigationBar(
-        initialPosition: Constants.appBarHomePosition,
+      bottomNavigationBar: AppBottomNavigationBar(
+        initialPosition:  ((widget.starredFragment)? Constants.appBarStarredPosition :  Constants.appBarHomePosition),
       ),
     );
   }

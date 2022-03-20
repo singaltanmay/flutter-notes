@@ -6,6 +6,11 @@ import 'package:app/model/resource_uri.dart';
 import 'package:app/ui/note_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../model/constants.dart';
+import '../model/url_builder.dart';
 
 class NoteListTile extends StatefulWidget {
   final Note note;
@@ -29,7 +34,7 @@ class NoteListTile extends StatefulWidget {
 
   Future<bool> delete() async {
     try {
-      var appendedUri = await ResourceUri.getAppendedUri(note.id!);
+      var appendedUri = await UrlBuilder().append("note").build();
       final response = await http.delete(appendedUri, headers: {
         "Accept": "application/json",
         "Access-Control-Allow-Origin": "*"
@@ -52,6 +57,15 @@ class NoteListTile extends StatefulWidget {
 }
 
 class _NoteListTileState extends State<NoteListTile> {
+
+  late bool isStarred;
+
+  @override
+  void initState() {
+    super.initState();
+    isStarred = widget.note.starred;
+  }
+
   Future<String?> getNoteCreatorUsername(String creatorId) async {
     var appendedUri = await ResourceUri.getAppendedUri("user/" + creatorId);
     final response = await http.get(appendedUri);
@@ -74,10 +88,12 @@ class _NoteListTileState extends State<NoteListTile> {
 
     if (widget.noteCreatorUsername == null) {
       getNoteCreatorUsername(widget.note.creator).then((value) => {
-            setState(() {
-              widget.noteCreatorUsername = value;
-            })
-          });
+        if (mounted){
+          setState(() {
+            widget.noteCreatorUsername = value;
+          })
+        }
+      });
     }
 
     return Padding(
@@ -88,8 +104,9 @@ class _NoteListTileState extends State<NoteListTile> {
           onTap: () => {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => NoteEditor(note: widget.note)),
+              PageRouteBuilder(
+                  pageBuilder: (_, __, ___) =>
+                      NoteEditor(note: widget.note)),
             ).then((value) => widget.onNoteEdited())
           },
           child: Column(
@@ -103,10 +120,9 @@ class _NoteListTileState extends State<NoteListTile> {
                     )),
                 title: Text(title),
                 subtitle: Text(
+                  DateFormat.jm().add_yMMMMd().format(
                   DateTime.parse(
-                          widget.note.created ?? DateTime.now().toString())
-                      .toLocal()
-                      .toString(),
+                          widget.note.created ?? DateTime.now().toString())),
                   style: TextStyle(color: Colors.black.withOpacity(0.6)),
                 ),
                 trailing: PopupMenuButton<int>(
@@ -148,22 +164,77 @@ class _NoteListTileState extends State<NoteListTile> {
                   ),
                 ],
               ),
-              ButtonBar(
-                alignment: MainAxisAlignment.start,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(
-                    onPressed: () {
-                      widget.delete();
-                      widget.onDelete();
-                    },
-                    child: Text('Delete'.toUpperCase()),
+                  ButtonBar(
+                    alignment: MainAxisAlignment.start,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          widget.delete();
+                          widget.onDelete();
+                        },
+                        child: Text('Delete'.toUpperCase()),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                  IconButton(
+                    padding: const EdgeInsets.only(right: 20,bottom: 10) ,
+                    onPressed: () => {handleOnPressed()},
+                    icon: (isStarred)
+                        ? Icon(Icons.star,
+                            color: Theme.of(context).accentColor)
+                        : Icon(
+                            Icons.star_border,
+                            color: Theme.of(context).accentColor,
+                          ))
+              ]
+              )
             ],
           ),
         ),
       ),
     );
+  }
+
+  handleOnPressed() {
+    updateNote();
+  }
+
+  void updateNote() async {
+    String currentUser = await getCurrentUserToken();
+    var note = Note(
+        id: widget.note.id,
+        title: widget.note.title,
+        body: widget.note.body,
+        creator: currentUser,
+        starred: !isStarred);
+
+    var baseUri = await UrlBuilder().append("note").build();
+    final response = await http.put(baseUri, body: note.toMap());
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      setState(()  {
+        isStarred = !isStarred;
+        widget.onNoteEdited();
+      });
+      //Navigator.pop(context);
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception(
+          'Failed to PUT Note $note. Response code = ${response.statusCode}\n');
+    }
+  }
+
+  Future<String> getCurrentUserToken() async {
+    var prefs = await SharedPreferences.getInstance();
+    String? currentUser = prefs.getString(Constants.userTokenKey);
+    if (currentUser == null) {
+      throw Exception('User Token not found in Shared Preferences!');
+    }
+    return currentUser;
   }
 }

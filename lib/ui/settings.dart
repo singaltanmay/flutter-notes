@@ -57,7 +57,7 @@ class Settings extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const AppBottomNavigationBar(
+      bottomNavigationBar: AppBottomNavigationBar(
         initialPosition: Constants.appBarSettingsPosition,
       ),
     );
