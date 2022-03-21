@@ -22,7 +22,7 @@ class ResourceUri {
       return Uri.parse(_normalized(sharedPrefsBaseUrl));
     }
     const String envBaseUrl = String.fromEnvironment('DB_BASE_URL',
-        defaultValue: 'http://localhost:3000/');
+        defaultValue: 'https://flutter-notes.herokuapp.com/');
     prefs.setString(Constants.databaseBaseUrl, envBaseUrl);
     return Uri.parse(_normalized(envBaseUrl));
   }
