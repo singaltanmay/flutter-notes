@@ -24,12 +24,13 @@ class _SignInState extends DbConnectedState<SignIn> {
   final TextEditingController _passwordController = TextEditingController();
   bool checkedValue = true;
 
+
   Future<void> onSignInPressed(Function callback) async {
     String username = _usernameController.text;
     String password = _passwordController.text;
 
     if (username.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
           content: Text('Username cannot be blank'),
         ),
@@ -38,7 +39,7 @@ class _SignInState extends DbConnectedState<SignIn> {
     }
 
     if (password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
           content: Text('Password cannot be blank'),
         ),
@@ -63,22 +64,6 @@ class _SignInState extends DbConnectedState<SignIn> {
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
-      ResourceUri.isServerHealthy().then((value) => {
-            if (!value)
-              {
-                showBottomSheet(
-                  builder: (context) {
-                    return NoConnectionModal(
-                      callback: () {
-                        // Close this modal sheet
-                        Navigator.of(context).pop();
-                      },
-                    );
-                  },
-                  context: context,
-                )
-              }
-          });
       throw Exception(
           'Failed to Sign In. Response code = ${response.statusCode}\n');
     }
@@ -87,7 +72,9 @@ class _SignInState extends DbConnectedState<SignIn> {
   @override
   Widget build(BuildContext context) {
     getPrefilledUserName();
+
     return MaterialApp(
+      scaffoldMessengerKey: scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
       title: "Sign In",
       home: Scaffold(
@@ -111,7 +98,13 @@ class _SignInState extends DbConnectedState<SignIn> {
                         size: 30, color: Color(0xffA6B0BD)),
                     hintText: "Password",
                     isPassword: true,
-                    controller: _passwordController),
+                    controller: _passwordController,
+                    onSubmitted: (_) => onSignInPressed(() => {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const AllNotes(starredFragment: false)),
+                      )
+                    })),
                 CheckboxListTile(
                     title: const Text("Remember Me",
                         style: TextStyle(fontSize: 14.0)),
@@ -162,11 +155,19 @@ class _SignInState extends DbConnectedState<SignIn> {
     );
   }
 
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _usernameController.dispose();
+    super.dispose();
+  }
+
   getPrefilledUserName() async {
     var prefs = await SharedPreferences.getInstance();
     _usernameController.text = prefs.getString(Constants.userName) ?? "";
     _passwordController.text = prefs.getString(Constants.password) ?? "";
   }
+
 }
 
 Widget _signUp(BuildContext context) {

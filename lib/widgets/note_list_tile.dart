@@ -58,13 +58,6 @@ class NoteListTile extends StatefulWidget {
 
 class _NoteListTileState extends State<NoteListTile> {
 
-  late bool isStarred;
-
-  @override
-  void initState() {
-    super.initState();
-    isStarred = widget.note.starred;
-  }
 
   Future<String?> getNoteCreatorUsername(String creatorId) async {
     var appendedUri = await ResourceUri.getAppendedUri("user/" + creatorId);
@@ -182,12 +175,12 @@ class _NoteListTileState extends State<NoteListTile> {
                   IconButton(
                     padding: const EdgeInsets.only(right: 20,bottom: 10) ,
                     onPressed: () => {handleOnPressed()},
-                    icon: (isStarred)
+                    icon: (widget.note.starred)
                         ? Icon(Icons.star,
-                            color: Theme.of(context).accentColor)
+                            color: Theme.of(context).colorScheme.secondary)
                         : Icon(
                             Icons.star_border,
-                            color: Theme.of(context).accentColor,
+                            color: Theme.of(context).colorScheme.secondary,
                           ))
               ]
               )
@@ -209,18 +202,14 @@ class _NoteListTileState extends State<NoteListTile> {
         title: widget.note.title,
         body: widget.note.body,
         creator: currentUser,
-        starred: !isStarred);
+        starred: !widget.note.starred);
 
     var baseUri = await UrlBuilder().append("note").build();
     final response = await http.put(baseUri, body: note.toMap());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      setState(()  {
-        isStarred = !isStarred;
-        widget.onNoteEdited();
-      });
-      //Navigator.pop(context);
+      widget.onNoteEdited();
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.

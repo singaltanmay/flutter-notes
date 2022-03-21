@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../model/db_connected_state.dart';
 import '../model/url_builder.dart';
 import '../widgets/logo.dart';
 import 'all_notes.dart';
@@ -15,7 +16,7 @@ class SignUp extends StatefulWidget {
   State<SignUp> createState() => _SignUpState();
 }
 
-class _SignUpState extends State<SignUp> {
+class _SignUpState extends DbConnectedState<SignUp> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController securityQuestionController = TextEditingController();
@@ -29,8 +30,9 @@ class _SignUpState extends State<SignUp> {
     String securityQuestion = securityQuestionController.text;
     String securityQuestionAnswer = securityQuestionAnswerController.text;
 
+    print("onSignUpPressed");
     if (username.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
           content: Text('Username cannot be blank'),
         ),
@@ -39,7 +41,7 @@ class _SignUpState extends State<SignUp> {
     }
 
     if (password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
           content: Text('Password cannot be blank'),
         ),
@@ -48,7 +50,7 @@ class _SignUpState extends State<SignUp> {
     }
 
     if (securityQuestion.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
           content: Text('Security Question needs to be set'),
         ),
@@ -57,7 +59,7 @@ class _SignUpState extends State<SignUp> {
     }
 
     if (securityQuestionAnswer.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
           content: Text('Security Question needs to be answered'),
         ),
@@ -125,6 +127,7 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
       title: "Sign Up",
       home: Scaffold(
@@ -162,7 +165,13 @@ class _SignUpState extends State<SignUp> {
                         size: 30, color: Color(0xffA6B0BD)),
                     hintText: "Security Question Answer",
                     isPassword: false,
-                    controller: securityQuestionAnswerController),
+                    controller: securityQuestionAnswerController,
+                    onSubmitted: (_) => onSignUpPressed(() => {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const AllNotes(starredFragment: false)),
+                      )
+                    })),
                 CheckboxListTile(
                     title: const Text("Remember Me",
                         style: TextStyle(fontSize: 14.0)),
