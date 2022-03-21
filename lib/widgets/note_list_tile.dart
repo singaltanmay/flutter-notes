@@ -1,17 +1,24 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:app/model/note.dart';
 import 'package:app/model/resource_uri.dart';
 import 'package:app/ui/note_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:number_display/number_display.dart';
+
+enum _VotingStatus { upvoted, downvoted, none }
+
+final numDisplay = createDisplay();
 
 class NoteListTile extends StatefulWidget {
   final Note note;
   final Function onDelete;
   final Function onNoteEdited;
   String? noteCreatorUsername;
+  _VotingStatus votingStatus = _VotingStatus.none;
 
   NoteListTile(
       {Key? key,
@@ -109,28 +116,6 @@ class _NoteListTileState extends State<NoteListTile> {
                       .toString(),
                   style: TextStyle(color: Colors.black.withOpacity(0.6)),
                 ),
-                trailing: PopupMenuButton<int>(
-                    itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
-                          const PopupMenuItem<int>(
-                              value: 0, child: Text('Delete'))
-                        ],
-                    onSelected: (int value) {
-                      if (value == 0) {
-                        widget.delete().then((deleted) => {
-                              if (!deleted)
-                                {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text('Could not delete all notes'),
-                                    ),
-                                  ),
-                                }
-                              else
-                                widget.onDelete()
-                            });
-                      }
-                    }),
               ),
               Row(
                 children: [
@@ -149,19 +134,116 @@ class _NoteListTileState extends State<NoteListTile> {
                 ],
               ),
               ButtonBar(
-                alignment: MainAxisAlignment.start,
+                alignment: MainAxisAlignment.spaceAround,
                 children: [
-                  TextButton(
-                    onPressed: () {
-                      widget.delete();
-                      widget.onDelete();
+                  _ButtonBarTextButton(
+                    icon: Icons.arrow_upward_rounded,
+                    label: numDisplay(Random().nextInt(10000)),
+                    pressed: widget.votingStatus == _VotingStatus.upvoted,
+                    onPressed: () => {
+                      widget.votingStatus =
+                          widget.votingStatus == _VotingStatus.upvoted
+                              ? _VotingStatus.none
+                              : _VotingStatus.upvoted
                     },
-                    child: Text('Delete'.toUpperCase()),
                   ),
+                  _ButtonBarTextButton(
+                    icon: Icons.arrow_downward_rounded,
+                    label: numDisplay(Random().nextInt(1000)),
+                    pressed: widget.votingStatus == _VotingStatus.downvoted,
+                    onPressed: () => {
+                      {
+                        widget.votingStatus =
+                            widget.votingStatus == _VotingStatus.downvoted
+                                ? _VotingStatus.none
+                                : _VotingStatus.downvoted
+                      },
+                    },
+                  ),
+                  _ButtonBarTextButton(
+                    icon: Icons.comment_outlined,
+                    label: numDisplay(Random().nextInt(100)),
+                    onPressed: () => {},
+                  ),
+                  PopupMenuButton<int>(
+                      icon: Icon(
+                        Icons.ios_share,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuItem<int>>[
+                            const PopupMenuItem<int>(
+                                value: 0, child: Text('Star')),
+                            const PopupMenuItem<int>(
+                                value: 1, child: Text('Delete'))
+                          ],
+                      onSelected: (int value) {
+                        if (value == 0) {
+                          // TODO star the note
+                        }
+                        if (value == 1) {
+                          widget.delete().then((deleted) => {
+                                if (!deleted)
+                                  {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Could not delete all notes'),
+                                      ),
+                                    ),
+                                  }
+                                else
+                                  widget.onDelete()
+                              });
+                        }
+                      }),
                 ],
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ButtonBarTextButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback? onPressed;
+  final bool pressed;
+
+  const _ButtonBarTextButton({
+    Key? key,
+    required this.icon,
+    required this.label,
+    this.onPressed,
+    this.pressed = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      icon: Icon(
+        icon,
+        color: pressed ? Theme.of(context).primaryColorDark : null,
+      ),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: pressed ? Theme.of(context).primaryColorDark : null,
+          fontWeight: pressed ? FontWeight.bold : null,
+        ),
+      ),
+      onPressed: onPressed ?? () => {},
+      style: ButtonStyle(
+        backgroundColor: pressed
+            ? MaterialStateProperty.all<Color>(
+                Theme.of(context).primaryColorLight)
+            : null,
+        elevation: pressed ? MaterialStateProperty.all(2) : null,
+        padding: MaterialStateProperty.all(
+          const EdgeInsets.all(12),
         ),
       ),
     );
