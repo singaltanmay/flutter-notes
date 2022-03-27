@@ -30,6 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.4
+  intl: ^0.17.0
   shared_preferences: 2.0.13
   # Formats number for truncated display https://pub.dev/packages/number_display
   number_display: ^3.0.0

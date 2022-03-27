@@ -24,7 +24,8 @@ class _NoteEditorState extends State<NoteEditor> {
     var note = Note(
         title: titleController.text,
         body: bodyController.text,
-        creator: currentUser);
+        creator: currentUser,
+        starred: false);
 
     var baseUri = await UrlBuilder().append("note").build();
     final response = await http.post(baseUri, body: note.toMap());
@@ -46,7 +47,8 @@ class _NoteEditorState extends State<NoteEditor> {
         id: widget.note?.id,
         title: titleController.text,
         body: bodyController.text,
-        creator: currentUser);
+        creator: currentUser,
+        starred: widget.note?.starred ?? false);
 
     var baseUri = await UrlBuilder().append("note").build();
     final response = await http.put(baseUri, body: note.toMap());

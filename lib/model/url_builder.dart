@@ -24,7 +24,10 @@ class UrlBuilder {
   Future<Uri> build({bool withToken = true}) async {
     if (withToken) {
       var prefs = await SharedPreferences.getInstance();
-      query("token", prefs.getString(Constants.userTokenKey)!);
+      var token = prefs.getString(Constants.userTokenKey);
+      if (token != null) {
+        query("token", token);
+      }
     }
     var baseUrl = await ResourceUri.getBase();
     return Uri.parse(baseUrl + currentAppend + currentQuery);

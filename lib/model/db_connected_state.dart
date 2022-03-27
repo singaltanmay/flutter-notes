@@ -5,6 +5,12 @@ import 'package:flutter/material.dart';
 // Custom State class that checks for database connectivity on creation.
 // If database cannot be reached then a NoConnectionModal() is displayed
 abstract class DbConnectedState<T extends StatefulWidget> extends State<T> {
+
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey();
+
+  GlobalKey<ScaffoldMessengerState> get scaffoldMessengerKey =>
+      _scaffoldMessengerKey;
+
   @override
   void initState() {
     super.initState();
@@ -12,7 +18,7 @@ abstract class DbConnectedState<T extends StatefulWidget> extends State<T> {
       ResourceUri.isServerHealthy().then((value) => {
             if (!value)
               {
-                showBottomSheet(
+                showModalBottomSheet(
                   builder: (context) {
                     return NoConnectionModal(
                       callback: () {
@@ -27,4 +33,5 @@ abstract class DbConnectedState<T extends StatefulWidget> extends State<T> {
           });
     });
   }
+
 }

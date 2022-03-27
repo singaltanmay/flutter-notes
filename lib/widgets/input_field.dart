@@ -6,11 +6,13 @@ class InputField extends StatefulWidget {
   final bool isPassword;
   final TextEditingController controller;
   Widget? suffixIcon;
+  Function(String)? onSubmitted;
 
   InputField(
       {Key? key,
       this.prefixIcon,
       this.suffixIcon,
+      this.onSubmitted,
       required this.hintText,
       this.isPassword = false,
       required this.controller})
@@ -39,6 +41,7 @@ class _InputFieldState extends State<InputField> {
       ),
       margin: const EdgeInsets.only(bottom: 20),
       child: TextField(
+        onSubmitted: widget.onSubmitted,
         controller: widget.controller,
         obscureText: widget.isPassword,
         decoration: InputDecoration(

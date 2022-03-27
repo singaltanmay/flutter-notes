@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class AppBottomNavigationBar extends StatefulWidget {
   final int initialPosition;
 
-  const AppBottomNavigationBar(
+  AppBottomNavigationBar(
       {Key? key, this.initialPosition = Constants.appBarHomePosition})
       : super(key: key);
 
@@ -32,15 +32,21 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar> {
           switch (value) {
             case Constants.appBarHomePosition:
               Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const AllNotes()));
+                  PageRouteBuilder(
+                      pageBuilder: (_, __, ___) =>
+                      const AllNotes(starredFragment: false)));
               break;
             case Constants.appBarSettingsPosition:
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (context) => Settings()));
+              Navigator.pushReplacement(context,
+                  PageRouteBuilder(
+                      pageBuilder: (_, __, ___) =>
+                      Settings()));
               break;
             default:
               Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const AllNotes()));
+                  PageRouteBuilder(
+                      pageBuilder: (_, __, ___) =>
+                      const AllNotes(starredFragment: true)));
               break;
           }
         }
