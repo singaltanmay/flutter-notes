@@ -7,13 +7,12 @@ import 'package:app/model/resource_uri.dart';
 import 'package:app/ui/note_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:intl/intl.dart';
+import 'package:number_display/number_display.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/constants.dart';
 import '../model/url_builder.dart';
-import 'package:number_display/number_display.dart';
 
 enum _VotingStatus { upvoted, downvoted, none }
 
@@ -65,8 +64,6 @@ class NoteListTile extends StatefulWidget {
 }
 
 class _NoteListTileState extends State<NoteListTile> {
-
-
   Future<String?> getNoteCreatorUsername(String creatorId) async {
     var appendedUri = await ResourceUri.getAppendedUri("user/" + creatorId);
     final response = await http.get(appendedUri);
@@ -89,12 +86,13 @@ class _NoteListTileState extends State<NoteListTile> {
 
     if (widget.noteCreatorUsername == null) {
       getNoteCreatorUsername(widget.note.creator).then((value) => {
-        if (mounted){
-          setState(() {
-            widget.noteCreatorUsername = value;
-          })
-        }
-      });
+            if (mounted)
+              {
+                setState(() {
+                  widget.noteCreatorUsername = value;
+                })
+              }
+          });
     }
 
     return Padding(
@@ -106,8 +104,7 @@ class _NoteListTileState extends State<NoteListTile> {
             Navigator.push(
               context,
               PageRouteBuilder(
-                  pageBuilder: (_, __, ___) =>
-                      NoteEditor(note: widget.note)),
+                  pageBuilder: (_, __, ___) => NoteEditor(note: widget.note)),
             ).then((value) => widget.onNoteEdited())
           },
           child: Column(
@@ -121,9 +118,8 @@ class _NoteListTileState extends State<NoteListTile> {
                     )),
                 title: Text(title),
                 subtitle: Text(
-                  DateFormat.jm().add_yMMMMd().format(
-                  DateTime.parse(
-                          widget.note.created ?? DateTime.now().toString())),
+                  DateFormat.jm().add_yMMMMd().format(DateTime.parse(
+                      widget.note.created ?? DateTime.now().toString())),
                   style: TextStyle(color: Colors.black.withOpacity(0.6)),
                 ),
               ),
@@ -143,34 +139,6 @@ class _NoteListTileState extends State<NoteListTile> {
                   ),
                 ],
               ),
-              /*
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ButtonBar(
-                    alignment: MainAxisAlignment.start,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          widget.delete();
-                          widget.onDelete();
-                        },
-                        child: Text('Delete'.toUpperCase()),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    padding: const EdgeInsets.only(right: 20,bottom: 10) ,
-                    onPressed: () => {handleOnPressed()},
-                    icon: (widget.note.starred)
-                        ? Icon(Icons.star,
-                            color: Theme.of(context).colorScheme.secondary)
-                        : Icon(
-                            Icons.star_border,
-                            color: Theme.of(context).colorScheme.secondary,
-                          ))
-              ]
-              )
               ButtonBar(
                 alignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -236,7 +204,7 @@ class _NoteListTileState extends State<NoteListTile> {
                         }
                       }),
                 ],
-              ),*/
+              ),
             ],
           ),
         ),
