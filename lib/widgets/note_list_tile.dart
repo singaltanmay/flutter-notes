@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:app/model/note.dart';
 import 'package:app/model/resource_uri.dart';
@@ -144,7 +143,9 @@ class _NoteListTileState extends State<NoteListTile> {
                 children: [
                   _ButtonBarTextButton(
                     icon: Icons.arrow_upward_rounded,
-                    label: numDisplay(Random().nextInt(10000)),
+                    label: numDisplay(widget.note.upvoters != null
+                        ? widget.note.upvoters!.length
+                        : 0),
                     pressed: widget.votingStatus == _VotingStatus.upvoted,
                     onPressed: () => {
                       widget.votingStatus =
@@ -155,7 +156,9 @@ class _NoteListTileState extends State<NoteListTile> {
                   ),
                   _ButtonBarTextButton(
                     icon: Icons.arrow_downward_rounded,
-                    label: numDisplay(Random().nextInt(1000)),
+                    label: numDisplay(widget.note.downvoters != null
+                        ? widget.note.downvoters!.length
+                        : 0),
                     pressed: widget.votingStatus == _VotingStatus.downvoted,
                     onPressed: () => {
                       {
@@ -168,41 +171,41 @@ class _NoteListTileState extends State<NoteListTile> {
                   ),
                   _ButtonBarTextButton(
                     icon: Icons.comment_outlined,
-                    label: numDisplay(Random().nextInt(100)),
+                    label: numDisplay(widget.note.comments != null
+                        ? widget.note.comments!.length
+                        : 0),
                     onPressed: () => {},
                   ),
                   PopupMenuButton<int>(
-                      icon: Icon(
-                        Icons.ios_share,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuItem<int>>[
-                            const PopupMenuItem<int>(
-                                value: 0, child: Text('Star')),
-                            const PopupMenuItem<int>(
-                                value: 1, child: Text('Delete'))
-                          ],
-                      onSelected: (int value) {
-                        if (value == 0) {
-                          // TODO star the note
-                        }
-                        if (value == 1) {
-                          widget.delete().then((deleted) => {
-                                if (!deleted)
-                                  {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                            Text('Could not delete all notes'),
-                                      ),
+                    icon: Icon(
+                      Icons.ios_share,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
+                      const PopupMenuItem<int>(value: 0, child: Text('Star')),
+                      const PopupMenuItem<int>(value: 1, child: Text('Delete'))
+                    ],
+                    onSelected: (int value) {
+                      if (value == 0) {
+                        // TODO star the note
+                      }
+                      if (value == 1) {
+                        widget.delete().then((deleted) => {
+                              if (!deleted)
+                                {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text('Could not delete all notes'),
                                     ),
-                                  }
-                                else
-                                  widget.onDelete()
-                              });
-                        }
-                      }),
+                                  ),
+                                }
+                              else
+                                widget.onDelete()
+                            });
+                      }
+                    },
+                  ),
                 ],
               ),
             ],
