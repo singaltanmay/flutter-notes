@@ -13,8 +13,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../model/constants.dart';
 import '../model/url_builder.dart';
 
-enum _VotingStatus { upvoted, downvoted, none }
-
 final numDisplay = createDisplay();
 
 class NoteListTile extends StatefulWidget {
@@ -22,7 +20,6 @@ class NoteListTile extends StatefulWidget {
   final Function onDelete;
   final Function onNoteEdited;
   String? noteCreatorUsername;
-  _VotingStatus votingStatus = _VotingStatus.none;
 
   NoteListTile(
       {Key? key,
@@ -138,37 +135,32 @@ class _NoteListTileState extends State<NoteListTile> {
                 children: [
                   _ButtonBarTextButton(
                     icon: Icons.arrow_upward_rounded,
-                    label: numDisplay(widget.note.upvoters != null
-                        ? widget.note.upvoters!.length
-                        : 0),
-                    pressed: widget.votingStatus == _VotingStatus.upvoted,
+                    label: numDisplay(widget.note.numberOfUpvotes),
+                    pressed: widget.note.requesterVoted == VotingStatus.upvoted,
                     onPressed: () => {
-                      widget.votingStatus =
-                          widget.votingStatus == _VotingStatus.upvoted
-                              ? _VotingStatus.none
-                              : _VotingStatus.upvoted
+                      widget.note.requesterVoted =
+                          widget.note.requesterVoted == VotingStatus.upvoted
+                              ? VotingStatus.none
+                              : VotingStatus.upvoted
                     },
                   ),
                   _ButtonBarTextButton(
                     icon: Icons.arrow_downward_rounded,
-                    label: numDisplay(widget.note.downvoters != null
-                        ? widget.note.downvoters!.length
-                        : 0),
-                    pressed: widget.votingStatus == _VotingStatus.downvoted,
+                    label: numDisplay(widget.note.numberOfDownvotes),
+                    pressed:
+                        widget.note.requesterVoted == VotingStatus.downvoted,
                     onPressed: () => {
                       {
-                        widget.votingStatus =
-                            widget.votingStatus == _VotingStatus.downvoted
-                                ? _VotingStatus.none
-                                : _VotingStatus.downvoted
+                        widget.note.requesterVoted =
+                            widget.note.requesterVoted == VotingStatus.downvoted
+                                ? VotingStatus.none
+                                : VotingStatus.downvoted
                       },
                     },
                   ),
                   _ButtonBarTextButton(
                     icon: Icons.comment_outlined,
-                    label: numDisplay(widget.note.comments != null
-                        ? widget.note.comments!.length
-                        : 0),
+                    label: numDisplay(widget.note.numberOfComments),
                     onPressed: () => {},
                   ),
                   PopupMenuButton<int>(
