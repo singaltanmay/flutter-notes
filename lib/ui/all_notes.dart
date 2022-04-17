@@ -1,25 +1,21 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:app/dao/note_dao.dart';
 import 'package:app/model/constants.dart';
 import 'package:app/model/db_connected_state.dart';
 import 'package:app/model/note.dart';
-import 'package:app/model/resource_uri.dart';
 import 'package:app/ui/note_editor.dart';
 import 'package:app/ui/signin.dart';
 import 'package:app/widgets/app_bottom_navigation_bar.dart';
 import 'package:app/widgets/note_list_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../model/url_builder.dart';
 
 class AllNotes extends StatefulWidget {
   final bool starredFragment;
 
-  const AllNotes({Key? key,required this.starredFragment}) : super(key: key);
+  const AllNotes({Key? key, required this.starredFragment}) : super(key: key);
 
   @override
   _AllNotesState createState() => _AllNotesState();
@@ -29,65 +25,10 @@ void printServerCommFailedError() {
   stderr.writeln('Failed to communicate with server');
 }
 
-Future<List<Note>> fetchNotes(bool starredFragment) async {
-  try {
-    Uri baseUri;
-    if(starredFragment){
-      baseUri = await UrlBuilder().path("note/starred").build();
-    }else{
-      baseUri = await UrlBuilder().path("note").build();
-    }
-    final response = await http.get(baseUri, headers: {
-      "Accept": "application/json",
-      "Access-Control-Allow-Origin": "*"
-    });
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      final List responseList = jsonDecode(response.body);
-      List<Note> noteObjectsList = [];
-      for (var element in responseList) {
-        noteObjectsList.add(Note.fromJson(element));
-      }
-      return noteObjectsList;
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      stderr.writeln('Failed to load all notes');
-      return [];
-    }
-  } on Exception {
-    printServerCommFailedError();
-    return [];
-  }
-}
-
-Future<bool> deleteAllNotes() async {
-  try {
-    var baseUri = await ResourceUri.getBaseUri();
-    final response = await http.delete(baseUri, headers: {
-      "Accept": "application/json",
-      "Access-Control-Allow-Origin": "*"
-    });
-
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      return true;
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to delete all notes');
-    }
-  } on Exception {
-    printServerCommFailedError();
-    return false;
-  }
-}
-
 class _AllNotesState extends DbConnectedState<AllNotes> {
   List<Note> _notes = [];
   bool _loadNotes = true;
+  NoteDao noteDao = NoteDao();
 
   void refreshNotesOnBuild() {
     setState(() {
@@ -110,14 +51,15 @@ class _AllNotesState extends DbConnectedState<AllNotes> {
   @override
   Widget build(BuildContext context) {
     if (_loadNotes) {
-      fetchNotes(widget.starredFragment).then((value) => {
-        if (mounted){
-          setState(() {
-            _loadNotes = false;
-            _notes = value;
-          })
-        }
-      });
+      noteDao.fetchNotes(widget.starredFragment).then((value) => {
+            if (mounted)
+              {
+                setState(() {
+                  _loadNotes = false;
+                  _notes = value;
+                })
+              }
+          });
     }
 
     List<Widget> noteWidgetsList = [];
@@ -145,7 +87,7 @@ class _AllNotesState extends DbConnectedState<AllNotes> {
                     ],
                 onSelected: (int value) {
                   if (value == 0) {
-                    deleteAllNotes().then((deleted) => {
+                    noteDao.deleteAllNotes().then((deleted) => {
                           if (!deleted)
                             {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -216,7 +158,7 @@ class _AllNotesState extends DbConnectedState<AllNotes> {
                     return;
                   }
                   // Remove the item from the data source.
-                  noteListTile.delete().then((value) => {
+                  noteDao.deleteNote(note).then((value) => {
                         if (!value)
                           {stdout.writeln("Note could not be deleted $note")}
                       });
@@ -231,7 +173,9 @@ class _AllNotesState extends DbConnectedState<AllNotes> {
         ),
       ),
       bottomNavigationBar: AppBottomNavigationBar(
-        initialPosition:  ((widget.starredFragment)? Constants.appBarStarredPosition :  Constants.appBarHomePosition),
+        initialPosition: ((widget.starredFragment)
+            ? Constants.appBarStarredPosition
+            : Constants.appBarHomePosition),
       ),
     );
   }

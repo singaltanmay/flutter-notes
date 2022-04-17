@@ -31,22 +31,22 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar> {
         if (_currentIndex != value) {
           switch (value) {
             case Constants.appBarHomePosition:
-              Navigator.pushReplacement(context,
+              Navigator.pushReplacement(
+                  context,
                   PageRouteBuilder(
                       pageBuilder: (_, __, ___) =>
-                      const AllNotes(starredFragment: false)));
+                          const AllNotes(starredFragment: false)));
               break;
             case Constants.appBarSettingsPosition:
               Navigator.pushReplacement(context,
-                  PageRouteBuilder(
-                      pageBuilder: (_, __, ___) =>
-                      Settings()));
+                  PageRouteBuilder(pageBuilder: (_, __, ___) => Settings()));
               break;
             default:
-              Navigator.pushReplacement(context,
+              Navigator.pushReplacement(
+                  context,
                   PageRouteBuilder(
                       pageBuilder: (_, __, ___) =>
-                      const AllNotes(starredFragment: true)));
+                          const AllNotes(starredFragment: true)));
               break;
           }
         }
