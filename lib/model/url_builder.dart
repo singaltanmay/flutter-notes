@@ -4,20 +4,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'constants.dart';
 
 class UrlBuilder {
-  var currentQueryChar = "?";
-  var currentQuery = "";
-  var currentAppend = "";
+  final Map<String, String> _queryMap = {};
+  var _currentAppend = "";
 
-  UrlBuilder append(String append) {
-    currentAppend = currentAppend + append + "/";
+  UrlBuilder path(String append) {
+    if (_currentAppend.isNotEmpty && !_currentAppend.endsWith("/")) {
+      _currentAppend += "/";
+    }
+    _currentAppend += append;
     return this;
   }
 
-  UrlBuilder query(String query, String value) {
-    if (currentQuery.isNotEmpty) {
-      currentQueryChar = "&";
-    }
-    currentQuery = currentQueryChar + query + "=" + value;
+  UrlBuilder query(String key, String value) {
+    _queryMap[key] = value;
     return this;
   }
 
@@ -30,6 +29,18 @@ class UrlBuilder {
       }
     }
     var baseUrl = await ResourceUri.getBase();
-    return Uri.parse(baseUrl + currentAppend + currentQuery);
+    var s = baseUrl + _currentAppend;
+    if (_queryMap.isNotEmpty) {
+      s += "?";
+      bool first = true;
+      _queryMap.forEach((key, value) {
+        if (!first) {
+          s += "&";
+        }
+        s += key + "=" + value;
+        first = false;
+      });
+    }
+    return Uri.parse(s);
   }
 }

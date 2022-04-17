@@ -33,9 +33,9 @@ Future<List<Note>> fetchNotes(bool starredFragment) async {
   try {
     Uri baseUri;
     if(starredFragment){
-      baseUri = await UrlBuilder().append("note/starred").build();
+      baseUri = await UrlBuilder().path("note/starred").build();
     }else{
-      baseUri = await UrlBuilder().append("note").build();
+      baseUri = await UrlBuilder().path("note").build();
     }
     final response = await http.get(baseUri, headers: {
       "Accept": "application/json",

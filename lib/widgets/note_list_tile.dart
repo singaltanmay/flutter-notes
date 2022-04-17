@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:app/dao/note_dao.dart';
 import 'package:app/model/note.dart';
 import 'package:app/model/resource_uri.dart';
 import 'package:app/ui/note_editor.dart';
@@ -13,8 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../model/constants.dart';
 import '../model/url_builder.dart';
 
-enum _VotingStatus { upvoted, downvoted, none }
-
 final numDisplay = createDisplay();
 
 class NoteListTile extends StatefulWidget {
@@ -22,7 +21,6 @@ class NoteListTile extends StatefulWidget {
   final Function onDelete;
   final Function onNoteEdited;
   String? noteCreatorUsername;
-  _VotingStatus votingStatus = _VotingStatus.none;
 
   NoteListTile(
       {Key? key,
@@ -40,7 +38,7 @@ class NoteListTile extends StatefulWidget {
 
   Future<bool> delete() async {
     try {
-      var appendedUri = await UrlBuilder().append("note").build();
+      var appendedUri = await UrlBuilder().path("note").build();
       final response = await http.delete(appendedUri, headers: {
         "Accept": "application/json",
         "Access-Control-Allow-Origin": "*"
@@ -63,6 +61,8 @@ class NoteListTile extends StatefulWidget {
 }
 
 class _NoteListTileState extends State<NoteListTile> {
+  final NoteDao noteDao = NoteDao();
+
   Future<String?> getNoteCreatorUsername(String creatorId) async {
     var appendedUri = await ResourceUri.getAppendedUri("user/" + creatorId);
     final response = await http.get(appendedUri);
@@ -85,12 +85,7 @@ class _NoteListTileState extends State<NoteListTile> {
 
     if (widget.noteCreatorUsername == null) {
       getNoteCreatorUsername(widget.note.creator).then((value) => {
-            if (mounted)
-              {
-                setState(() {
-                  widget.noteCreatorUsername = value;
-                })
-              }
+            if (mounted) {setState(() => widget.noteCreatorUsername = value)}
           });
     }
 
@@ -143,37 +138,28 @@ class _NoteListTileState extends State<NoteListTile> {
                 children: [
                   _ButtonBarTextButton(
                     icon: Icons.arrow_upward_rounded,
-                    label: numDisplay(widget.note.upvoters != null
-                        ? widget.note.upvoters!.length
-                        : 0),
-                    pressed: widget.votingStatus == _VotingStatus.upvoted,
+                    label: numDisplay(widget.note.numberOfUpvotes),
+                    pressed: widget.note.requesterVoted == VotingStatus.upvoted,
                     onPressed: () => {
-                      widget.votingStatus =
-                          widget.votingStatus == _VotingStatus.upvoted
-                              ? _VotingStatus.none
-                              : _VotingStatus.upvoted
+                      widget.note.setRequesterVoted(VotingStatus.upvoted),
+                      noteDao.voteOnNote(widget.note)
                     },
                   ),
                   _ButtonBarTextButton(
                     icon: Icons.arrow_downward_rounded,
-                    label: numDisplay(widget.note.downvoters != null
-                        ? widget.note.downvoters!.length
-                        : 0),
-                    pressed: widget.votingStatus == _VotingStatus.downvoted,
+                    label: numDisplay(widget.note.numberOfDownvotes),
+                    pressed:
+                        widget.note.requesterVoted == VotingStatus.downvoted,
                     onPressed: () => {
                       {
-                        widget.votingStatus =
-                            widget.votingStatus == _VotingStatus.downvoted
-                                ? _VotingStatus.none
-                                : _VotingStatus.downvoted
+                        widget.note.setRequesterVoted(VotingStatus.downvoted),
+                        noteDao.voteOnNote(widget.note)
                       },
                     },
                   ),
                   _ButtonBarTextButton(
                     icon: Icons.comment_outlined,
-                    label: numDisplay(widget.note.comments != null
-                        ? widget.note.comments!.length
-                        : 0),
+                    label: numDisplay(widget.note.numberOfComments),
                     onPressed: () => {},
                   ),
                   PopupMenuButton<int>(
@@ -228,7 +214,7 @@ class _NoteListTileState extends State<NoteListTile> {
         creator: currentUser,
         starred: !widget.note.starred);
 
-    var baseUri = await UrlBuilder().append("note").build();
+    var baseUri = await UrlBuilder().path("note").build();
     final response = await http.put(baseUri, body: note.toMap());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
