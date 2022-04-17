@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 // Custom State class that checks for database connectivity on creation.
 // If database cannot be reached then a NoConnectionModal() is displayed
 abstract class DbConnectedState<T extends StatefulWidget> extends State<T> {
-
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey();
 
   GlobalKey<ScaffoldMessengerState> get scaffoldMessengerKey =>
@@ -33,5 +32,4 @@ abstract class DbConnectedState<T extends StatefulWidget> extends State<T> {
           });
     });
   }
-
 }

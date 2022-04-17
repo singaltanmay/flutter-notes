@@ -67,8 +67,7 @@ class _SignUpState extends DbConnectedState<SignUp> {
       return;
     }
 
-    var appendedUri =
-        await UrlBuilder().path("signup").build(withToken: false);
+    var appendedUri = await UrlBuilder().path("signup").build(withToken: false);
     final response = await http.post(appendedUri, body: {
       "username": username,
       "password": password,
@@ -114,7 +113,9 @@ class _SignUpState extends DbConnectedState<SignUp> {
         onPressed: () => onSignUpPressed(() => {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const AllNotes(starredFragment: false)),
+                MaterialPageRoute(
+                    builder: (context) =>
+                        const AllNotes(starredFragment: false)),
               )
             }),
         textColor: Colors.white,
@@ -167,11 +168,13 @@ class _SignUpState extends DbConnectedState<SignUp> {
                     isPassword: false,
                     controller: securityQuestionAnswerController,
                     onSubmitted: (_) => onSignUpPressed(() => {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const AllNotes(starredFragment: false)),
-                      )
-                    })),
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const AllNotes(starredFragment: false)),
+                          )
+                        })),
                 CheckboxListTile(
                     title: const Text("Remember Me",
                         style: TextStyle(fontSize: 14.0)),

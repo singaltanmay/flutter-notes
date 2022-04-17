@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:app/dao/note_dao.dart';
 import 'package:app/model/note.dart';
-import 'package:app/model/resource_uri.dart';
 import 'package:app/ui/note_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -20,7 +18,6 @@ class NoteListTile extends StatefulWidget {
   final Note note;
   final Function onDelete;
   final Function onNoteEdited;
-  String? noteCreatorUsername;
 
   NoteListTile(
       {Key? key,
@@ -35,59 +32,15 @@ class NoteListTile extends StatefulWidget {
   void printServerCommFailedError() {
     stderr.writeln('Failed to communicate with server');
   }
-
-  Future<bool> delete() async {
-    try {
-      var appendedUri = await UrlBuilder().path("note").build();
-      final response = await http.delete(appendedUri, headers: {
-        "Accept": "application/json",
-        "Access-Control-Allow-Origin": "*"
-      });
-
-      if (response.statusCode == 200) {
-        // If the server did return a 200 OK response,
-        // then parse the JSON.
-        return true;
-      } else {
-        // If the server did not return a 200 OK response,
-        // then throw an exception.
-        throw Exception('Failed to delete the note');
-      }
-    } on Exception {
-      printServerCommFailedError();
-      return false;
-    }
-  }
 }
 
 class _NoteListTileState extends State<NoteListTile> {
   final NoteDao noteDao = NoteDao();
 
-  Future<String?> getNoteCreatorUsername(String creatorId) async {
-    var appendedUri = await ResourceUri.getAppendedUri("user/" + creatorId);
-    final response = await http.get(appendedUri);
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      final Map responseBody = jsonDecode(response.body);
-      return responseBody["username"];
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      return null;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     String title = widget.note.title;
     String body = widget.note.body;
-
-    if (widget.noteCreatorUsername == null) {
-      getNoteCreatorUsername(widget.note.creator).then((value) => {
-            if (mounted) {setState(() => widget.noteCreatorUsername = value)}
-          });
-    }
 
     return Padding(
       padding: const EdgeInsets.all(4.0),
@@ -123,8 +76,8 @@ class _NoteListTileState extends State<NoteListTile> {
                     child: Container(
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
-                        widget.noteCreatorUsername != null
-                            ? body + " -- @" + widget.noteCreatorUsername!
+                        widget.note.creatorUsername != null
+                            ? body + " -- @" + widget.note.creatorUsername!
                             : body,
                         textAlign: TextAlign.start,
                         style: TextStyle(color: Colors.black.withOpacity(0.6)),
@@ -141,8 +94,10 @@ class _NoteListTileState extends State<NoteListTile> {
                     label: numDisplay(widget.note.numberOfUpvotes),
                     pressed: widget.note.requesterVoted == VotingStatus.upvoted,
                     onPressed: () => {
-                      widget.note.setRequesterVoted(VotingStatus.upvoted),
-                      noteDao.voteOnNote(widget.note)
+                      setState(() {
+                        widget.note.setRequesterVoted(VotingStatus.upvoted);
+                        noteDao.voteOnNote(widget.note);
+                      })
                     },
                   ),
                   _ButtonBarTextButton(
@@ -152,8 +107,10 @@ class _NoteListTileState extends State<NoteListTile> {
                         widget.note.requesterVoted == VotingStatus.downvoted,
                     onPressed: () => {
                       {
-                        widget.note.setRequesterVoted(VotingStatus.downvoted),
-                        noteDao.voteOnNote(widget.note)
+                        setState(() {
+                          widget.note.setRequesterVoted(VotingStatus.downvoted);
+                          noteDao.voteOnNote(widget.note);
+                        })
                       },
                     },
                   ),
@@ -176,7 +133,7 @@ class _NoteListTileState extends State<NoteListTile> {
                         // TODO star the note
                       }
                       if (value == 1) {
-                        widget.delete().then((deleted) => {
+                        noteDao.deleteNote(widget.note).then((deleted) => {
                               if (!deleted)
                                 {
                                   ScaffoldMessenger.of(context).showSnackBar(
