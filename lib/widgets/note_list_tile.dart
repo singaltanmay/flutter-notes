@@ -85,12 +85,7 @@ class _NoteListTileState extends State<NoteListTile> {
 
     if (widget.noteCreatorUsername == null) {
       getNoteCreatorUsername(widget.note.creator).then((value) => {
-            if (mounted)
-              {
-                setState(() {
-                  widget.noteCreatorUsername = value;
-                })
-              }
+            if (mounted) {setState(() => widget.noteCreatorUsername = value)}
           });
     }
 

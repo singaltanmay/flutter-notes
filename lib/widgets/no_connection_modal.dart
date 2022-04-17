@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'input_field.dart';
 
 class NoConnectionModal extends StatelessWidget {
+  String? title;
   Function? callback;
 
-  NoConnectionModal({Key? key, this.callback}) : super(key: key);
+  NoConnectionModal({Key? key, this.callback, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +31,12 @@ class NoConnectionModal extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Wrap(
             children: [
-              const Padding(
-                padding: EdgeInsets.only(bottom: 24, left: 8, right: 8),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24, left: 8, right: 8),
                 child: Text(
-                  "Could not connect to the Flutter Notes database server",
-                  style: TextStyle(fontSize: 16),
+                  title?.toString() ??
+                      "Could not connect to the Flutter Notes database server",
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
               const SizedBox(height: 24),

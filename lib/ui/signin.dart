@@ -1,16 +1,15 @@
 import 'package:app/model/constants.dart';
 import 'package:app/model/db_connected_state.dart';
-import 'package:app/model/resource_uri.dart';
 import 'package:app/ui/all_notes.dart';
 import 'package:app/ui/signup.dart';
 import 'package:app/widgets/input_field.dart';
+import 'package:app/widgets/no_connection_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/url_builder.dart';
 import '../widgets/logo.dart';
-import '../widgets/no_connection_modal.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -23,7 +22,6 @@ class _SignInState extends DbConnectedState<SignIn> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool checkedValue = true;
-
 
   Future<void> onSignInPressed(Function callback) async {
     String username = _usernameController.text;
@@ -100,11 +98,13 @@ class _SignInState extends DbConnectedState<SignIn> {
                     isPassword: true,
                     controller: _passwordController,
                     onSubmitted: (_) => onSignInPressed(() => {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const AllNotes(starredFragment: false)),
-                      )
-                    })),
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const AllNotes(starredFragment: false)),
+                          )
+                        })),
                 CheckboxListTile(
                     title: const Text("Remember Me",
                         style: TextStyle(fontSize: 14.0)),
@@ -145,9 +145,25 @@ class _SignInState extends DbConnectedState<SignIn> {
         onPressed: () => onSignInPressed(() => {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const AllNotes(starredFragment: false)),
+                MaterialPageRoute(
+                    builder: (context) =>
+                        const AllNotes(starredFragment: false)),
               )
             }),
+        onLongPress: () => {
+          showModalBottomSheet(
+            builder: (context) {
+              return NoConnectionModal(
+                title: 'Flutter Notes Database Server URL',
+                callback: () {
+                  // Close this modal sheet
+                  Navigator.of(context).pop();
+                },
+              );
+            },
+            context: context,
+          )
+        },
         textColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 25),
         child: const Text("SIGN IN"),
@@ -167,7 +183,6 @@ class _SignInState extends DbConnectedState<SignIn> {
     _usernameController.text = prefs.getString(Constants.userName) ?? "";
     _passwordController.text = prefs.getString(Constants.password) ?? "";
   }
-
 }
 
 Widget _signUp(BuildContext context) {
