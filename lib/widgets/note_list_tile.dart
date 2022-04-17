@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:app/dao/note_dao.dart';
 import 'package:app/model/note.dart';
 import 'package:app/model/resource_uri.dart';
 import 'package:app/ui/note_editor.dart';
@@ -37,7 +38,7 @@ class NoteListTile extends StatefulWidget {
 
   Future<bool> delete() async {
     try {
-      var appendedUri = await UrlBuilder().append("note").build();
+      var appendedUri = await UrlBuilder().path("note").build();
       final response = await http.delete(appendedUri, headers: {
         "Accept": "application/json",
         "Access-Control-Allow-Origin": "*"
@@ -60,6 +61,8 @@ class NoteListTile extends StatefulWidget {
 }
 
 class _NoteListTileState extends State<NoteListTile> {
+  final NoteDao noteDao = NoteDao();
+
   Future<String?> getNoteCreatorUsername(String creatorId) async {
     var appendedUri = await ResourceUri.getAppendedUri("user/" + creatorId);
     final response = await http.get(appendedUri);
@@ -138,10 +141,8 @@ class _NoteListTileState extends State<NoteListTile> {
                     label: numDisplay(widget.note.numberOfUpvotes),
                     pressed: widget.note.requesterVoted == VotingStatus.upvoted,
                     onPressed: () => {
-                      widget.note.requesterVoted =
-                          widget.note.requesterVoted == VotingStatus.upvoted
-                              ? VotingStatus.none
-                              : VotingStatus.upvoted
+                      widget.note.setRequesterVoted(VotingStatus.upvoted),
+                      noteDao.voteOnNote(widget.note)
                     },
                   ),
                   _ButtonBarTextButton(
@@ -151,10 +152,8 @@ class _NoteListTileState extends State<NoteListTile> {
                         widget.note.requesterVoted == VotingStatus.downvoted,
                     onPressed: () => {
                       {
-                        widget.note.requesterVoted =
-                            widget.note.requesterVoted == VotingStatus.downvoted
-                                ? VotingStatus.none
-                                : VotingStatus.downvoted
+                        widget.note.setRequesterVoted(VotingStatus.downvoted),
+                        noteDao.voteOnNote(widget.note)
                       },
                     },
                   ),
@@ -215,7 +214,7 @@ class _NoteListTileState extends State<NoteListTile> {
         creator: currentUser,
         starred: !widget.note.starred);
 
-    var baseUri = await UrlBuilder().append("note").build();
+    var baseUri = await UrlBuilder().path("note").build();
     final response = await http.put(baseUri, body: note.toMap());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,

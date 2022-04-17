@@ -22,9 +22,9 @@ class Note {
   final bool starred;
   final String creator;
   final String? creatorUsername;
-  final int numberOfUpvotes;
-  final int numberOfDownvotes;
-  final int numberOfComments;
+  int numberOfUpvotes;
+  int numberOfDownvotes;
+  int numberOfComments;
   VotingStatus requesterVoted;
 
   Note({
@@ -90,5 +90,58 @@ class Note {
     map["creator"] = creator;
     map["starred"] = starred.toString();
     return map;
+  }
+
+  void setRequesterVoted(VotingStatus newVote) {
+    VotingStatus previousVote = requesterVoted;
+    // If user is voting for the same vote, then remove all votes
+    if (newVote == previousVote) {
+      newVote = VotingStatus.none;
+    }
+    switch (newVote) {
+      case VotingStatus.upvoted:
+        {
+          if (previousVote == VotingStatus.none) {
+            numberOfUpvotes++;
+          } else if (previousVote == VotingStatus.downvoted) {
+            numberOfDownvotes--;
+            numberOfUpvotes++;
+          } else if (previousVote == VotingStatus.upvoted) {
+            numberOfUpvotes--;
+          }
+          break;
+        }
+      case VotingStatus.none:
+        if (previousVote == VotingStatus.upvoted) {
+          numberOfUpvotes--;
+        } else if (previousVote == VotingStatus.downvoted) {
+          numberOfDownvotes--;
+        }
+        break;
+      case VotingStatus.downvoted:
+        {
+          if (previousVote == VotingStatus.none) {
+            numberOfDownvotes++;
+          } else if (previousVote == VotingStatus.upvoted) {
+            numberOfUpvotes--;
+            numberOfDownvotes++;
+          } else if (previousVote == VotingStatus.downvoted) {
+            numberOfDownvotes--;
+          }
+          break;
+        }
+    }
+    requesterVoted = newVote;
+  }
+
+  int getVotingStatusInt() {
+    switch (requesterVoted) {
+      case VotingStatus.none:
+        return 0;
+      case VotingStatus.upvoted:
+        return 1;
+      case VotingStatus.downvoted:
+        return -1;
+    }
   }
 }

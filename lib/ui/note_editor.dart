@@ -27,7 +27,7 @@ class _NoteEditorState extends State<NoteEditor> {
         creator: currentUser,
         starred: false);
 
-    var baseUri = await UrlBuilder().append("note").build();
+    var baseUri = await UrlBuilder().path("note").build();
     final response = await http.post(baseUri, body: note.toMap());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
@@ -50,7 +50,7 @@ class _NoteEditorState extends State<NoteEditor> {
         creator: currentUser,
         starred: widget.note?.starred ?? false);
 
-    var baseUri = await UrlBuilder().append("note").build();
+    var baseUri = await UrlBuilder().path("note").build();
     final response = await http.put(baseUri, body: note.toMap());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,

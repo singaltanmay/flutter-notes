@@ -46,7 +46,7 @@ class _SignInState extends DbConnectedState<SignIn> {
     }
 
     var appendedUri =
-        await UrlBuilder().append("signin").build(withToken: false);
+        await UrlBuilder().path("signin").build(withToken: false);
     final response = await http
         .post(appendedUri, body: {"username": username, "password": password});
     if (response.statusCode == 200) {
