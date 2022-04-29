@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app/dao/note_dao.dart';
 import 'package:app/model/note.dart';
+import 'package:app/ui/note_details.dart';
 import 'package:app/ui/note_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/constants.dart';
 import '../model/url_builder.dart';
+import 'button_bar_text_button.dart';
 
 final numDisplay = createDisplay();
 
@@ -51,8 +53,8 @@ class _NoteListTileState extends State<NoteListTile> {
             Navigator.push(
               context,
               PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => NoteEditor(note: widget.note)),
-            ).then((value) => widget.onNoteEdited())
+                  pageBuilder: (_, __, ___) => NoteDetails(note: widget.note)),
+            )
           },
           child: Column(
             children: [
@@ -89,7 +91,7 @@ class _NoteListTileState extends State<NoteListTile> {
               ButtonBar(
                 alignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _ButtonBarTextButton(
+                  ButtonBarTextButton(
                     icon: Icons.arrow_upward_rounded,
                     label: numDisplay(widget.note.numberOfUpvotes),
                     pressed: widget.note.requesterVoted == VotingStatus.upvoted,
@@ -100,7 +102,7 @@ class _NoteListTileState extends State<NoteListTile> {
                       })
                     },
                   ),
-                  _ButtonBarTextButton(
+                  ButtonBarTextButton(
                     icon: Icons.arrow_downward_rounded,
                     label: numDisplay(widget.note.numberOfDownvotes),
                     pressed:
@@ -114,7 +116,7 @@ class _NoteListTileState extends State<NoteListTile> {
                       },
                     },
                   ),
-                  _ButtonBarTextButton(
+                  ButtonBarTextButton(
                     icon: Icons.comment_outlined,
                     label: numDisplay(widget.note.numberOfComments),
                     onPressed: () => {},
@@ -125,12 +127,17 @@ class _NoteListTileState extends State<NoteListTile> {
                       color: Theme.of(context).primaryColor,
                     ),
                     itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
-                      const PopupMenuItem<int>(value: 0, child: Text('Star')),
+                      const PopupMenuItem<int>(value: 0, child: Text('Edit')),
                       const PopupMenuItem<int>(value: 1, child: Text('Delete'))
                     ],
                     onSelected: (int value) {
                       if (value == 0) {
-                        // TODO star the note
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                              pageBuilder: (_, __, ___) =>
+                                  NoteEditor(note: widget.note)),
+                        ).then((value) => widget.onNoteEdited());
                       }
                       if (value == 1) {
                         noteDao.deleteNote(widget.note).then((deleted) => {
@@ -192,48 +199,5 @@ class _NoteListTileState extends State<NoteListTile> {
       throw Exception('User Token not found in Shared Preferences!');
     }
     return currentUser;
-  }
-}
-
-class _ButtonBarTextButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback? onPressed;
-  final bool pressed;
-
-  const _ButtonBarTextButton({
-    Key? key,
-    required this.icon,
-    required this.label,
-    this.onPressed,
-    this.pressed = false,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton.icon(
-      icon: Icon(
-        icon,
-        color: pressed ? Theme.of(context).primaryColorDark : null,
-      ),
-      label: Text(
-        label,
-        style: TextStyle(
-          color: pressed ? Theme.of(context).primaryColorDark : null,
-          fontWeight: pressed ? FontWeight.bold : null,
-        ),
-      ),
-      onPressed: onPressed ?? () => {},
-      style: ButtonStyle(
-        backgroundColor: pressed
-            ? MaterialStateProperty.all<Color>(
-                Theme.of(context).primaryColorLight)
-            : null,
-        elevation: pressed ? MaterialStateProperty.all(2) : null,
-        padding: MaterialStateProperty.all(
-          const EdgeInsets.all(12),
-        ),
-      ),
-    );
   }
 }

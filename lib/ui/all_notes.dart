@@ -143,32 +143,7 @@ class _AllNotesState extends DbConnectedState<AllNotes> {
                 onDelete: () => setState(() {
                       _notes.removeAt(index);
                     }));
-            return Dismissible(
-                // Each Dismissible must contain a Key. Keys allow Flutter to
-                // uniquely identify widgets.
-                key: Key(note.id!),
-                // Provide a function that tells the app
-                // what to do after an item has been swiped away.
-                onDismissed: (direction) {
-                  if (note.id == null) {
-                    // Then show a snackbar.
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            '"${note.title.substring(0, min(30, note.title.length))}..." cannot be deleted')));
-                    return;
-                  }
-                  // Remove the item from the data source.
-                  noteDao.deleteNote(note).then((value) => {
-                        if (!value)
-                          {stdout.writeln("Note could not be deleted $note")}
-                      });
-
-                  // Then show a snackbar.
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                          '"${note.title.substring(0, min(30, note.title.length))}..." deleted')));
-                },
-                child: noteListTile);
+            return noteListTile;
           },
         ),
       ),
