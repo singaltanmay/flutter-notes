@@ -5,13 +5,9 @@ import 'package:app/model/note.dart';
 import 'package:app/ui/note_details.dart';
 import 'package:app/ui/note_editor.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:number_display/number_display.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../model/constants.dart';
-import '../model/url_builder.dart';
 import 'button_bar_text_button.dart';
 
 final numDisplay = createDisplay();
@@ -163,41 +159,5 @@ class _NoteListTileState extends State<NoteListTile> {
         ),
       ),
     );
-  }
-
-  handleOnPressed() {
-    updateNote();
-  }
-
-  void updateNote() async {
-    String currentUser = await getCurrentUserToken();
-    var note = Note(
-        id: widget.note.id,
-        title: widget.note.title,
-        body: widget.note.body,
-        creator: currentUser,
-        starred: !widget.note.starred);
-
-    var baseUri = await UrlBuilder().path("note").build();
-    final response = await http.put(baseUri, body: note.toMap());
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      widget.onNoteEdited();
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception(
-          'Failed to PUT Note $note. Response code = ${response.statusCode}\n');
-    }
-  }
-
-  Future<String> getCurrentUserToken() async {
-    var prefs = await SharedPreferences.getInstance();
-    String? currentUser = prefs.getString(Constants.userTokenKey);
-    if (currentUser == null) {
-      throw Exception('User Token not found in Shared Preferences!');
-    }
-    return currentUser;
   }
 }

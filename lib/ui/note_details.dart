@@ -3,7 +3,10 @@ import 'package:app/model/note.dart';
 import 'package:app/widgets/button_bar_text_button.dart';
 import 'package:app/widgets/note_comment_item.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:number_display/number_display.dart';
+
+import 'note_editor.dart';
 
 final numDisplay = createDisplay();
 
@@ -14,6 +17,9 @@ class NoteDetails extends StatefulWidget {
 
   @override
   State<NoteDetails> createState() => _NoteDetailsState();
+
+  // TODO
+  onNoteEdited() {}
 }
 
 class _NoteDetailsState extends State<NoteDetails> {
@@ -25,26 +31,42 @@ class _NoteDetailsState extends State<NoteDetails> {
       body: Column(
         children: [
           AppBar(
-            title: Text(widget.note.title),
+            title: Text("@" + widget.note.creatorUsername! + "'s note"),
             backgroundColor: Theme.of(context).backgroundColor,
             foregroundColor: Colors.black87,
-            elevation: 0,
           ),
-          Container(
-            width: double.infinity,
-            color: Theme.of(context).canvasColor,
+          Material(
+            elevation: 2,
             child: Column(
               children: [
-                const SizedBox(
-                  height: 32,
+                ListTile(
+                  leading: Container(
+                      padding: const EdgeInsets.all(12.0),
+                      child: const Icon(
+                        Icons.ac_unit_rounded,
+                        size: 32.0,
+                      )),
+                  title: Text(widget.note.title),
+                  subtitle: Text(
+                    DateFormat.jm().add_yMMMMd().format(DateTime.parse(
+                        widget.note.created ?? DateTime.now().toString())),
+                    style: TextStyle(color: Colors.black.withOpacity(0.6)),
+                  ),
                 ),
-                Text(widget.note.creatorUsername!),
-                const SizedBox(
-                  height: 32,
-                ),
-                Text(widget.note.body),
-                const SizedBox(
-                  height: 16,
+                Row(
+                  children: [
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          widget.note.body,
+                          textAlign: TextAlign.start,
+                          style:
+                              TextStyle(color: Colors.black.withOpacity(0.6)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 ButtonBar(
                   alignment: MainAxisAlignment.spaceAround,
@@ -81,19 +103,71 @@ class _NoteDetailsState extends State<NoteDetails> {
                       label: numDisplay(widget.note.numberOfComments),
                       onPressed: () => {},
                     ),
+                    PopupMenuButton<int>(
+                      icon: Icon(
+                        Icons.ios_share,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuItem<int>>[
+                        const PopupMenuItem<int>(value: 0, child: Text('Edit')),
+                        const PopupMenuItem<int>(
+                            value: 1, child: Text('Delete'))
+                      ],
+                      onSelected: (int value) {
+                        if (value == 0) {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                                pageBuilder: (_, __, ___) =>
+                                    NoteEditor(note: widget.note)),
+                          ).then((value) => widget.onNoteEdited());
+                        }
+                        if (value == 1) {
+                          noteDao.deleteNote(widget.note).then((deleted) => {
+                                if (!deleted)
+                                  {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Could not delete all notes'),
+                                      ),
+                                    ),
+                                  }
+                                else
+                                  Navigator.pop(context)
+                              });
+                        }
+                      },
+                    ),
                   ],
                 ),
-                const Divider(color: Colors.lightBlueAccent, height: 16,),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                          padding: const EdgeInsets.all(16),
+                          color:
+                              Theme.of(context).backgroundColor.withAlpha(169),
+                          child: Text(
+                            "Comments",
+                            style: Theme.of(context).textTheme.bodyText2,
+                          )),
+                    )
+                  ],
+                ),
               ],
             ),
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(16),
-            itemCount: 5,
-            itemBuilder: (context, index) {
-              return const NoteCommentItem();
-            },
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              padding: const EdgeInsets.all(16),
+              itemCount: 50,
+              itemBuilder: (context, index) {
+                return const NoteCommentItem();
+              },
+            ),
           )
         ],
       ),
