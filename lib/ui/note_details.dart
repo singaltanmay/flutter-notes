@@ -1,4 +1,6 @@
+import 'package:app/dao/comment_dao.dart';
 import 'package:app/dao/note_dao.dart';
+import 'package:app/model/comment.dart';
 import 'package:app/model/note.dart';
 import 'package:app/widgets/button_bar_text_button.dart';
 import 'package:app/widgets/note_comment_item.dart';
@@ -12,6 +14,7 @@ final numDisplay = createDisplay();
 
 class NoteDetails extends StatefulWidget {
   Note note;
+  List<Comment> commentsList = [];
 
   NoteDetails({Key? key, required this.note}) : super(key: key);
 
@@ -24,6 +27,21 @@ class NoteDetails extends StatefulWidget {
 
 class _NoteDetailsState extends State<NoteDetails> {
   final NoteDao noteDao = NoteDao();
+  final CommentDao commentDao = CommentDao();
+
+  void fetchCommentsList() {
+    commentDao
+        .getCommentsForNote(widget.note.id)
+        .then((_commentsList) => setState(() {
+              widget.commentsList = _commentsList;
+            }));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) => {fetchCommentsList()});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -160,13 +178,18 @@ class _NoteDetailsState extends State<NoteDetails> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              padding: const EdgeInsets.all(16),
-              itemCount: 50,
-              itemBuilder: (context, index) {
-                return const NoteCommentItem();
+            child: RefreshIndicator(
+              onRefresh: () async {
+                fetchCommentsList();
               },
+              child: ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(16),
+                itemCount: widget.commentsList.length,
+                itemBuilder: (context, index) {
+                  return NoteCommentItem(comment: widget.commentsList[index]);
+                },
+              ),
             ),
           )
         ],
