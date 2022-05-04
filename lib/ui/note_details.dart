@@ -2,6 +2,8 @@ import 'package:app/dao/comment_dao.dart';
 import 'package:app/dao/note_dao.dart';
 import 'package:app/model/comment.dart';
 import 'package:app/model/note.dart';
+import 'package:app/model/voting-status.dart' as int_voting_status;
+import 'package:app/widgets/add_comment_modal.dart';
 import 'package:app/widgets/button_bar_text_button.dart';
 import 'package:app/widgets/note_comment_item.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +48,38 @@ class _NoteDetailsState extends State<NoteDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Theme.of(context).backgroundColor,
+        foregroundColor: Colors.black,
+        onPressed: () {
+          // Respond to button press
+          showModalBottomSheet(
+            builder: (context) {
+              return AddCommentModal(
+                username: widget.note.creatorUsername!,
+                parentBody: widget.note.body,
+                onCommentAdd: (commentBody) async {
+                  var comment = Comment(
+                      requesterVoted: int_voting_status.VotingStatus.none,
+                      parentCommentId: null,
+                      body: commentBody,
+                      parentNoteId: widget.note.id!);
+                  var success = await commentDao.postCommentToNote(comment);
+                  // Close this modal sheet
+                  if (success) {
+                    Navigator.of(context).pop();
+                    fetchCommentsList();
+                  }
+                },
+              );
+            },
+            context: context,
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: Text("Add a comment".toUpperCase()),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Column(
         children: [
           AppBar(
@@ -191,7 +225,7 @@ class _NoteDetailsState extends State<NoteDetails> {
                 },
               ),
             ),
-          )
+          ),
         ],
       ),
     );

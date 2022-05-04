@@ -7,8 +7,7 @@ import 'package:http/http.dart' as http;
 
 class CommentDao extends BaseDao {
   Future<List<Comment>> getCommentsForNote(noteId) async {
-    Uri requestUrl;
-    requestUrl =
+    Uri requestUrl =
         await UrlBuilder().path("note").path(noteId).path("comments").build();
     final response = await http.get(requestUrl, headers: BaseDao.headers);
     if (response.statusCode == 200) {
@@ -27,5 +26,23 @@ class CommentDao extends BaseDao {
           response.reasonPhrase);
       return [];
     }
+  }
+
+  Future<bool> postCommentToNote(Comment comment) async {
+    Uri requestUrl = await UrlBuilder()
+        .path("note")
+        .path(comment.parentNoteId)
+        .path("comment")
+        .build();
+    final response = await http.post(requestUrl,
+        body: comment.toMap(), headers: BaseDao.headers);
+    if (response.statusCode != 200) {
+      printRequestError(
+          'Post new comment for Note failed. Path: ' + requestUrl.path,
+          response.statusCode,
+          response.reasonPhrase);
+      return false;
+    }
+    return true;
   }
 }

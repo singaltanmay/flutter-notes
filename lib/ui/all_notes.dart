@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:app/dao/note_dao.dart';
 import 'package:app/model/constants.dart';

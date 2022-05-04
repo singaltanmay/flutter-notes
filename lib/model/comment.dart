@@ -16,20 +16,20 @@ class Comment {
   final String? id;
   final String body;
   String? created = DateTime.now().toString();
-  final String creator;
-  final String creatorUsername;
+  final String? creator;
+  final String? creatorUsername;
   int numberOfUpvotes = 0;
   int numberOfDownvotes = 0;
   int requesterVoted = VotingStatus.none;
-  final String? parentNoteId;
+  final String parentNoteId;
   final String? parentCommentId;
   int numberOfNestedComments = 0;
 
   Comment({
     this.id,
     required this.body,
-    required this.creator,
-    required this.creatorUsername,
+    this.creator,
+    this.creatorUsername,
     created,
     numberOfUpvotes,
     numberOfDownvotes,
@@ -52,5 +52,16 @@ class Comment {
         requesterVoted: json['requesterVoted'],
         parentNoteId: json['parentNote'],
         parentCommentId: json['parentCommentId']);
+  }
+
+  Map toMap() {
+    Map<String, dynamic> map = {};
+    map["body"] = body;
+    map["created"] = created ?? DateTime.now().toString();
+    map["parentNote"] = parentNoteId;
+    if (parentCommentId != null && parentCommentId!.isNotEmpty) {
+      map["parentComment"] = parentCommentId;
+    }
+    return map;
   }
 }
