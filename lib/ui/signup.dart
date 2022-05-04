@@ -22,7 +22,7 @@ class _SignUpState extends DbConnectedState<SignUp> {
   TextEditingController securityQuestionController = TextEditingController();
   TextEditingController securityQuestionAnswerController =
       TextEditingController();
-  bool checkedValue = true;
+  bool rememberMeBool = true;
 
   Future<void> onSignUpPressed(Function callback) async {
     String username = usernameController.text;
@@ -80,9 +80,8 @@ class _SignUpState extends DbConnectedState<SignUp> {
       var prefs = await SharedPreferences.getInstance();
       prefs.setString(Constants.userTokenKey, response.body);
 
-      if (checkedValue) {
+      if (rememberMeBool) {
         prefs.setString(Constants.userName, username);
-        prefs.setString(Constants.password, password);
       }
 
       callback();
@@ -178,10 +177,10 @@ class _SignUpState extends DbConnectedState<SignUp> {
                 CheckboxListTile(
                     title: const Text("Remember Me",
                         style: TextStyle(fontSize: 14.0)),
-                    value: checkedValue,
+                    value: rememberMeBool,
                     onChanged: (newValue) {
                       setState(() {
-                        checkedValue = newValue ?? true;
+                        rememberMeBool = newValue ?? true;
                       });
                     },
                     controlAffinity: ListTileControlAffinity.leading),

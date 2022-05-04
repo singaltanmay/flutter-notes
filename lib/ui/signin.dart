@@ -21,7 +21,7 @@ class SignIn extends StatefulWidget {
 class _SignInState extends DbConnectedState<SignIn> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool checkedValue = true;
+  bool rememberMeBool = true;
 
   Future<void> onSignInPressed(Function callback) async {
     String username = _usernameController.text;
@@ -53,9 +53,8 @@ class _SignInState extends DbConnectedState<SignIn> {
       // then parse the JSON.
       var prefs = await SharedPreferences.getInstance();
       prefs.setString(Constants.userTokenKey, response.body);
-      if (checkedValue) {
+      if (rememberMeBool) {
         prefs.setString(Constants.userName, username);
-        prefs.setString(Constants.password, password);
       }
       callback();
     } else {
@@ -107,10 +106,10 @@ class _SignInState extends DbConnectedState<SignIn> {
                 CheckboxListTile(
                     title: const Text("Remember Me",
                         style: TextStyle(fontSize: 14.0)),
-                    value: checkedValue,
+                    value: rememberMeBool,
                     onChanged: (newValue) {
                       setState(() {
-                        checkedValue = newValue ?? true;
+                        rememberMeBool = newValue ?? true;
                       });
                     },
                     controlAffinity: ListTileControlAffinity.leading),

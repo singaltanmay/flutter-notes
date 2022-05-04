@@ -4,21 +4,9 @@ import 'package:app/model/note.dart';
 import 'package:app/model/url_builder.dart';
 import 'package:http/http.dart' as http;
 
-class NoteDao {
-  static const headers = {
-    "Accept": "application/json",
-    "Access-Control-Allow-Origin": "*"
-  };
+import 'base_dao.dart';
 
-  void printRequestError(requestPath, statusCode, reasonPhrase) {
-    print('Failed to complete request ' +
-        requestPath.toString() +
-        '\nResponse - HTTP ' +
-        statusCode.toString() +
-        "\t" +
-        reasonPhrase.toString());
-  }
-
+class NoteDao extends BaseDao {
   Future<List<Note>> fetchNotes(bool starredFragment) async {
     Uri requestUrl;
     if (starredFragment) {
@@ -26,7 +14,7 @@ class NoteDao {
     } else {
       requestUrl = await UrlBuilder().path("note").build();
     }
-    final response = await http.get(requestUrl, headers: headers);
+    final response = await http.get(requestUrl, headers: BaseDao.headers);
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
@@ -52,7 +40,7 @@ class NoteDao {
         .path("vote")
         .query("vote", votingStatusIntString)
         .build();
-    final response = await http.post(requestUrl, headers: headers);
+    final response = await http.post(requestUrl, headers: BaseDao.headers);
     if (response.statusCode == 200) {
       return true;
     } else {
@@ -65,7 +53,7 @@ class NoteDao {
   Future<bool> deleteNote(Note note) async {
     var requestUrl =
         await UrlBuilder().path("note").query('noteid', note.id!).build();
-    final response = await http.delete(requestUrl, headers: headers);
+    final response = await http.delete(requestUrl, headers: BaseDao.headers);
     if (response.statusCode == 200) {
       return true;
     } else {
@@ -77,7 +65,7 @@ class NoteDao {
 
   Future<bool> deleteAllNotes() async {
     var requestUrl = await UrlBuilder().path("note").build();
-    final response = await http.delete(requestUrl, headers: headers);
+    final response = await http.delete(requestUrl, headers: BaseDao.headers);
     if (response.statusCode == 200) {
       return true;
     } else {

@@ -1,7 +1,6 @@
-import 'package:app/model/constants.dart';
+import 'package:app/dao/base_dao.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/note.dart';
 import '../model/url_builder.dart';
@@ -20,7 +19,7 @@ class _NoteEditorState extends State<NoteEditor> {
   TextEditingController bodyController = TextEditingController();
 
   void postNewNote() async {
-    String currentUser = await getCurrentUserToken();
+    String currentUser = await BaseDao.getCurrentUserToken();
     var note = Note(
         title: titleController.text,
         body: bodyController.text,
@@ -42,7 +41,7 @@ class _NoteEditorState extends State<NoteEditor> {
   }
 
   void updateNote() async {
-    String currentUser = await getCurrentUserToken();
+    String currentUser = await BaseDao.getCurrentUserToken();
     var note = Note(
         id: widget.note?.id,
         title: titleController.text,
@@ -62,15 +61,6 @@ class _NoteEditorState extends State<NoteEditor> {
       throw Exception(
           'Failed to PUT Note $note. Response code = ${response.statusCode}\n');
     }
-  }
-
-  Future<String> getCurrentUserToken() async {
-    var prefs = await SharedPreferences.getInstance();
-    String? currentUser = prefs.getString(Constants.userTokenKey);
-    if (currentUser == null) {
-      throw Exception('User Token not found in Shared Preferences!');
-    }
-    return currentUser;
   }
 
   @override
