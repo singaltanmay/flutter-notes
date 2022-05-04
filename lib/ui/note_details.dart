@@ -221,7 +221,13 @@ class _NoteDetailsState extends State<NoteDetails> {
                 padding: const EdgeInsets.all(16),
                 itemCount: widget.commentsList.length,
                 itemBuilder: (context, index) {
-                  return NoteCommentItem(comment: widget.commentsList[index]);
+                  return Column(children: [
+                    Align(
+                  alignment: Alignment.centerLeft,
+                        child: NoteCommentItem(
+                            comment: widget.commentsList[index])),
+                    const Divider()
+                  ]);
                 },
               ),
             ),
