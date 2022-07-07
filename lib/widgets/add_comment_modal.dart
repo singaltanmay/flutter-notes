@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 
-class AddCommentModal extends StatelessWidget {
-  final String parentBody;
-  final String username;
-  final Function onCommentAdd;
+class EditCommentModal extends StatelessWidget {
+  final String title;
+  final Function onCommentEdit;
+  final String? initialValue;
 
-  const AddCommentModal(
+  const EditCommentModal(
       {Key? key,
-      required this.parentBody,
-      required this.username,
-      required this.onCommentAdd})
+      required this.title,
+      required this.onCommentEdit,
+      this.initialValue})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController _commentBodyController =
-        TextEditingController();
+        TextEditingController(text: initialValue);
 
     return SingleChildScrollView(
       child: ConstrainedBox(
@@ -28,10 +28,7 @@ class AddCommentModal extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 24, left: 8, right: 8),
                 child: Text(
-                  "Adding comment under note by @" +
-                      username +
-                      "\n\n" +
-                      parentBody.toString(),
+                  title,
                   style: const TextStyle(fontSize: 16),
                 ),
               ),
@@ -72,7 +69,7 @@ class AddCommentModal extends StatelessWidget {
                   child: FlatButton.icon(
                     hoverColor: Colors.transparent,
                     onPressed: () {
-                      onCommentAdd(_commentBodyController.text);
+                      onCommentEdit(_commentBodyController.text);
                     },
                     textColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 25),

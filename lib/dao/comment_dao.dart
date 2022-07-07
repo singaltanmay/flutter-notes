@@ -45,4 +45,17 @@ class CommentDao extends BaseDao {
     }
     return true;
   }
+
+  Future<bool> updateComment(Comment comment) async {
+    Uri requestUrl =
+        await UrlBuilder().path("comment").query("id", comment.id!).build();
+    final response = await http.put(requestUrl,
+        body: comment.toMap(), headers: BaseDao.headers);
+    if (response.statusCode != 200) {
+      printRequestError('Updating comment failed. Path: ' + requestUrl.path,
+          response.statusCode, response.reasonPhrase);
+      return false;
+    }
+    return true;
+  }
 }

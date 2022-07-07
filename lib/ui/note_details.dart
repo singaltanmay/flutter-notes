@@ -55,10 +55,12 @@ class _NoteDetailsState extends State<NoteDetails> {
           // Respond to button press
           showModalBottomSheet(
             builder: (context) {
-              return AddCommentModal(
-                username: widget.note.creatorUsername!,
-                parentBody: widget.note.body,
-                onCommentAdd: (commentBody) async {
+              return EditCommentModal(
+                title: "Adding comment under note by @" +
+                    widget.note.creatorUsername! +
+                    "\n\n" +
+                    widget.note.body.toString(),
+                onCommentEdit: (commentBody) async {
                   var comment = Comment(
                       requesterVoted: int_voting_status.VotingStatus.none,
                       parentCommentId: null,
@@ -223,7 +225,7 @@ class _NoteDetailsState extends State<NoteDetails> {
                 itemBuilder: (context, index) {
                   return Column(children: [
                     Align(
-                  alignment: Alignment.centerLeft,
+                        alignment: Alignment.centerLeft,
                         child: NoteCommentItem(
                             comment: widget.commentsList[index])),
                     const Divider()

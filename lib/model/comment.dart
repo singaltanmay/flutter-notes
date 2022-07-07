@@ -14,7 +14,7 @@ import 'package:app/model/voting-status.dart';
 
 class Comment {
   final String? id;
-  final String body;
+  String body;
   String? created = DateTime.now().toString();
   final String? creator;
   final String? creatorUsername;

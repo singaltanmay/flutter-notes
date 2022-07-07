@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:number_display/number_display.dart';
 
+import 'add_comment_modal.dart';
+
 final numDisplay = createDisplay();
 
 class NoteCommentItem extends StatefulWidget {
@@ -134,13 +136,25 @@ class _NoteCommentItemState extends State<NoteCommentItem> {
               ],
               onSelected: (int value) {
                 if (value == 0) {
-                  // TODO
-                  // Navigator.push(
-                  //   context,
-                  //   PageRouteBuilder(
-                  //       pageBuilder: (_, __, ___) =>
-                  //           CommentEditor(Comment: widget.comment)),
-                  // ).then((value) => widget.onCommentEdited());
+                  showModalBottomSheet(
+                    builder: (context) {
+                      return EditCommentModal(
+                        title: "Editing comment",
+                        initialValue: widget.comment.body,
+                        onCommentEdit: (commentBody) async {
+                          widget.comment.body = commentBody;
+                          var success =
+                              await _commentDao.updateComment(widget.comment);
+                          // Close this modal sheet
+                          if (success) {
+                            Navigator.of(context).pop();
+                            setState(() {});
+                          }
+                        },
+                      );
+                    },
+                    context: context,
+                  );
                 }
                 if (value == 1) {
                   // TODO
