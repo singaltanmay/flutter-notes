@@ -54,20 +54,24 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar> {
       },
       items: const [
         BottomNavigationBarItem(
-          label: 'Home',
-          icon: Icon(Icons.home),
+          activeIcon: Icon(Icons.stars),
+          label: 'Feed',
+          icon: Icon(Icons.stars_outlined),
         ),
         BottomNavigationBarItem(
+          activeIcon: Icon(Icons.search),
           label: 'Search',
-          icon: Icon(Icons.search),
+          icon: Icon(Icons.search_outlined),
         ),
         BottomNavigationBarItem(
-          label: 'Starred',
-          icon: Icon(Icons.star),
+          activeIcon: Icon(Icons.chat_bubble),
+          label: 'Chat',
+          icon: Icon(Icons.chat_bubble_outline),
         ),
         BottomNavigationBarItem(
+          activeIcon: Icon(Icons.settings),
           label: 'Settings',
-          icon: Icon(Icons.settings),
+          icon: Icon(Icons.settings_outlined),
         ),
       ],
     );
