@@ -3,28 +3,28 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
-  "index.html": "826b32e4136b80384ae31ab3492a32eb",
-"/": "826b32e4136b80384ae31ab3492a32eb",
-"manifest.json": "da5ea7f824787d88e04d1a04fea791b4",
-"favicon.png": "d7dd5db756469bc6a959baf6f4aafe3d",
-"version.json": "11e1a177d57c5da2bc6e3a6acc3010f4",
-"assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
-"assets/NOTICES": "5c54564c0528a30a5ed26d2124a5b2c8",
-"assets/fonts/MaterialIcons-Regular.otf": "7e7a6cccddf6d7b20012a548461d5d81",
-"assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
-"assets/AssetManifest.json": "2efbb41d7877d10aac9d091f58ccd7b9",
+  "favicon.png": "d7dd5db756469bc6a959baf6f4aafe3d",
+"canvaskit/canvaskit.js": "c2b4e5f3d7a3d82aed024e7249a78487",
 "canvaskit/profiling/canvaskit.js": "ae2949af4efc61d28a4a80fffa1db900",
 "canvaskit/profiling/canvaskit.wasm": "95e736ab31147d1b2c7b25f11d4c32cd",
-"canvaskit/canvaskit.js": "c2b4e5f3d7a3d82aed024e7249a78487",
 "canvaskit/canvaskit.wasm": "4b83d89d9fecbea8ca46f2f760c5a9ba",
-"main.dart.js": "0b57660caf69be7311cea3c771ac265c"
+"index.html": "203fd3506207ab4eeb5244ccf27fafd2",
+"/": "203fd3506207ab4eeb5244ccf27fafd2",
+"flutter.js": "eb2682e33f25cd8f1fc59011497c35f8",
+"manifest.json": "da5ea7f824787d88e04d1a04fea791b4",
+"version.json": "11e1a177d57c5da2bc6e3a6acc3010f4",
+"assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
+"assets/fonts/MaterialIcons-Regular.otf": "95db9098c58fd6db106f1116bae85a0b",
+"assets/AssetManifest.json": "2efbb41d7877d10aac9d091f58ccd7b9",
+"assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
+"assets/NOTICES": "67ce59d316903bdc08effa8b64c61728",
+"main.dart.js": "99d9338c3db0a016df10ed3344cb1955"
 };
 
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = [
-  "/",
-"main.dart.js",
+  "main.dart.js",
 "index.html",
 "assets/NOTICES",
 "assets/AssetManifest.json",
